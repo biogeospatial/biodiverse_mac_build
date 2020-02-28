@@ -23,17 +23,9 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Probe wd
-        run: pwd
-        
-      - name: Patch and install libgnomecanvas
         run: |
-          brew edit libgnomecanvas
           pwd
-          #  insert these lines into the build, immediately after the line containing "def install":
-          #  system "\curl -L https://raw.githubusercontent.com/shawnlaffan/biodiverse/master/etc/libgnomecanvas.patch > libgnomecanvas.patch"
-          #  system "patch -d libgnomecanvas < libgnomecanvas.patch"
-          #  then exit the editor
-          brew install --build-from-source libgnomecanvas        
+          ls -l
 
       - name: Install GDAL and its deps
         run: brew install gdal
