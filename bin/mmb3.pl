@@ -41,9 +41,9 @@ my $script            = $opt->script;
 my $verbose           = $opt->verbose ? $opt->verbose : q{};
 my $lib_paths         = $opt->lib_paths ? $opt->lib_paths : [q{/usr/local/opt}];
 my $execute           = $opt->execute ? '-x' : q{};
-my @pixbuf_loaders    = $opt->pixbuf_loaders? $opt->pixbuf_loaders : q{/usr/local/opt/gdk-pixbuf/lib/gdk-pixbuf-2.0/2.10.0/loaders}; # need a way of finding this.
+my @pixbuf_loaders    = $opt->pixbuf_loaders ? $opt->pixbuf_loaders : q{/usr/local/opt/gdk-pixbuf/lib/gdk-pixbuf-2.0/2.10.0/loaders}; # need a way of finding this.
 my @pixbuf_query_loader     = $opt->pixbuf_query_loader? $opt->pixbuf_query_loader : q{/usr/local/bin/gdk-pixbuf-query-loaders}; # need a way of finding this.
-my @hicolor           = $opt->hicolor? $opt->hicolor : q{/usr/local/share/icons/hicolor}; # need a way of finding this.
+my @hicolor           = $opt->hicolor ? $opt->hicolor : q{/usr/local/share/icons/hicolor}; # need a way of finding this.
 my @rest_of_pp_args   = @ARGV;
 
 #die "Script file $script does not exist or is unreadable" if !-r $script;
@@ -82,7 +82,7 @@ my @links;
 # All the dynamic libraries to pack.
 # Could change this to only include 
 # the minimum set and then use 
-# otools -L to find all dependancies.
+# otools -L to find all dependencies.
 my @dylibs = (
     'libgdal.20.dylib',          'libgobject-2.0.0.dylib', 
     'libglib-2.0.0.dylib',       'libffi.6.dylib', 
@@ -220,9 +220,9 @@ my $mime_dir;
 
 sub get_xdg_data_dirs(){
     my @xdg_data_dirs = xdg_data_dirs;
-    for $a (@xdg_data_dirs){
-        if ( -d $a . "/mime" ) {
-            $mime_dir = $a . "/mime";
+    for my $dir (@xdg_data_dirs){
+        if ( -d $dir . "/mime" ) {
+            $mime_dir = $dir . "/mime";
         }
     }
 }
@@ -230,8 +230,8 @@ sub get_xdg_data_dirs(){
 get_xdg_data_dirs();
 
 
-for $a($mime_dir) {
-    my $mime_dir_abs  = Path::Class::file ($a)->basename;
+for my $dir ($mime_dir) {
+    my $mime_dir_abs  = Path::Class::file ($dir)->basename;
     push @add_files, ('-a', "$mime_dir\;$mime_dir_abs");  
 }
 
