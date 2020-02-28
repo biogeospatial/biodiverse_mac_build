@@ -22,12 +22,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install GDAL and its deps
-        run: brew install gdal
-        
-      - name: Install Gtk etc
-        run: brew install gdk-pixbuf pango gtk+ gtk+3 libglade
-        
       - name: Probe wd
         run: pwd
         
@@ -40,6 +34,13 @@ jobs:
           #  system "patch -d libgnomecanvas < libgnomecanvas.patch"
           #  then exit the editor
           brew install --build-from-source libgnomecanvas        
+
+      - name: Install GDAL and its deps
+        run: brew install gdal
+        
+      - name: Install Gtk etc
+        run: brew install gdk-pixbuf pango gtk+ gtk+3 libglade
+        
         
       - name: Set up Perl
         run: |
