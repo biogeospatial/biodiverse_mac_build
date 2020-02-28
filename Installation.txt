@@ -1,3 +1,0 @@
-Installation instructions for the different operating systems can be found at http://purl.org/biodiverse/wiki/Installation
-
-For more general help, see http://purl.org/biodiverse/wiki/Home
