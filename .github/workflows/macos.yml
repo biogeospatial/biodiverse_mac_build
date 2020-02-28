@@ -1,0 +1,73 @@
+name: macos
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+env:
+  PERL5LIB: /Users/runner/perl5/lib/perl5
+  PERL_LOCAL_LIB_ROOT: /Users/runner/perl5
+  PERL_MB_OPT: --install_base /Users/runner/perl5
+  PERL_MM_OPT: INSTALL_BASE=/Users/runner/perl5
+
+jobs:
+  perl:
+
+    runs-on: macOS-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install GDAL and its deps
+        run: brew install gdal
+        
+      - name: Install Gtk etc
+        run: brew install gdk-pixbuf pango gtk+ gtk+3 libglade
+        
+      - name: Probe wd
+        run: pwd
+        
+      - name: Patch and install libgnomecanvas
+        run: |
+          brew edit libgnomecanvas
+          pwd
+          #  insert these lines into the build, immediately after the line containing "def install":
+          #  system "\curl -L https://raw.githubusercontent.com/shawnlaffan/biodiverse/master/etc/libgnomecanvas.patch > libgnomecanvas.patch"
+          #  system "patch -d libgnomecanvas < libgnomecanvas.patch"
+          #  then exit the editor
+          brew install --build-from-source libgnomecanvas        
+        
+      - name: Set up Perl
+        run: |
+          brew install perl
+          curl https://cpanmin.us | perl - App::cpanminus -n
+          echo "##[add-path]/Users/runner/perl5/bin"
+
+      - name: perl -V
+        run: perl -V
+
+      - name: Prepare for cache
+        run: |
+          perl -V > perlversion.txt
+          ls -l perlversion.txt
+
+      - name: Cache CPAN modules
+        uses: actions/cache@v1
+        with:
+          path: ~/perl5
+          key: ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
+
+      - name: Install Dynamic Dependencies
+        run: cpanm --notest Task::Biodiverse::NoGUI
+      
+      - name: Install packer libs
+        run: cpanm --notest PAR::Packer
+      
+      
+        
