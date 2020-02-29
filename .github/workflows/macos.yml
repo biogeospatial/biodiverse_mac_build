@@ -35,7 +35,9 @@ jobs:
         
       - name: Install Gtk etc
         run: brew install gdk-pixbuf pango gtk+ gtk+3 libglade
-        
+      
+      - name: Install libgnomecanvas
+        run: brew install libgnomecanvas
         
       - name: Set up Perl
         run: |
