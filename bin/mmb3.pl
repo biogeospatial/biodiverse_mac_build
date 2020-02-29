@@ -107,8 +107,8 @@ my @dylibs = (
     'libgnomecanvas-2.0.dylib',  'libart_lgpl_2.2.dylib', 
     'libgailutil.18.dylib',      'libfribidi.0.dylib',
     'libzstd.1.dylib',
-    '/usr/local/Cellar/libxml2/2.9.6/lib/libxml2.2.dylib', 
-    '/usr/local/Cellar/sqlite/3.21.0/lib/libsqlite3.0.dylib', 
+    '/usr/local/Cellar/libxml2/2.9.10/lib/libxml2.2.dylib', 
+    '/usr/local/Cellar/sqlite/3.31.1/lib/libsqlite3.0.dylib', 
     'libgraphite2.3.dylib',
 );
 
