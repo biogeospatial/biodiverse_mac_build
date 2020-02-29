@@ -33,11 +33,11 @@ jobs:
       - name: Install GDAL and its deps
         run: brew install gdal
         
-      #- name: Get lib names
-      #  run: |
-      #    ls /usr/local/Cellar/libgeotiff/1.5.1/lib/*.dylib
-      #    ls /usr/local/Cellar/geos/3.8.0/lib/*.dylib
-      #    find /usr/local/Cellar/ -name 'liblwgeom*.dylib'
+      - name: Get lib names
+        run: |
+          find /usr/local/Cellar/ -name 'libxml2*.dylib' -print
+          find /usr/local/Cellar/ -name '*lwgeom*.dylib' -print
+          find /usr/local/Cellar/ -name 'libsqlite3*.dylib' -print
           
         
       - name: Install Gtk etc
