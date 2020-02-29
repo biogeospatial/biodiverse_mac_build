@@ -72,6 +72,8 @@ jobs:
       - name: Install cpan deps 
         run: |
           cpanm --notest Task::Biodiverse::NoGUI
+          cpanm --notest ExtUtils::PkgConfig
+          cpanm --notest ExtUtils::Depends
           cpanm --notest Task::Biodiverse
           cpanm --notest PAR::Packer
           cpanm --notest File::BaseDir
