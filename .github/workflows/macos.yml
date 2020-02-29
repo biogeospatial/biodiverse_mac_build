@@ -26,6 +26,8 @@ jobs:
         run: |
           pwd
           ls -l
+      - name: Install pkgconfig
+        run: brew install pkgconfig
 
       - name: Install GDAL and its deps
         run: brew install gdal
@@ -62,6 +64,7 @@ jobs:
       - name: Install Dynamic Dependencies
         run: |
           cpanm --notest Task::Biodiverse::NoGUI
+          which -a pkg-config
           cpanm --notest -v ExtUtils::PkgConfig
           cpanm --notest Task::Biodiverse
       
