@@ -64,22 +64,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
 
-      - name: Set DYLD_LIBRARY_PATH for libgnomecanvas
-        run: |
-          export DYLD_LIBRARY_PATH=`pwd`:${DYLD_LIBRARY_PATH}
-          export LD_LIBRARY_PATH=`pwd`:${LD_LIBRARY_PATH}
+      #- name: Set DYLD_LIBRARY_PATH for libgnomecanvas
+      #  run: |
+      #    export DYLD_LIBRARY_PATH=`pwd`:${DYLD_LIBRARY_PATH}
+      #    export LD_LIBRARY_PATH=`pwd`:${LD_LIBRARY_PATH}
 
-      - name: Install Dynamic Dependencies
+      - name: Install cpan deps 
         run: |
           cpanm --notest Task::Biodiverse::NoGUI
-          cpanm --notest ExtUtils::PkgConfig
-          cpanm --notest ExtUtils::Depends
-          cpanm --notest Gtk2
-          cpanm --notest Gnome2::Canvas
           cpanm --notest Task::Biodiverse
-      
-      - name: Install packer and build libs
-        run: |
           cpanm --notest PAR::Packer
           cpanm --notest File::BaseDir
           cpanm --notest File::Find::Rule
