@@ -78,8 +78,11 @@ jobs:
           cpanm --notest Gnome2::Canvas
           cpanm --notest Task::Biodiverse
       
-      - name: Install packer libs
-        run: cpanm --notest PAR::Packer
+      - name: Install packer and build libs
+        run: |
+          cpanm --notest PAR::Packer
+          cpanm --notest File::BaseDir
+          cpanm --notest File::Find::Rule
         
       - name: Clone biodiverse repo
         run: git clone https://github.com/shawnlaffan/biodiverse.git
