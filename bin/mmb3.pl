@@ -96,7 +96,7 @@ my @dylibs = (
     'libatk-1.0.0.dylib',        'libgdk_pixbuf-2.0.0.dylib', 
     'libgio-2.0.0.dylib',        'libgmodule-2.0.0.dylib', 
     'libssl.1.0.0.dylib',        'libcrypto.1.0.0.dylib', 
-    'libgdal.20.dylib',          'libproj.13.dylib', 
+    'libgdal.20.dylib',          'libproj.15.dylib', 
     'libjson-c.4.dylib',         'libfreexl.1.dylib', 
     'libgeos_c.1.dylib',         'libgif.7.dylib', 
     'libjpeg.9.dylib',           'libgeotiff.2.dylib', 
