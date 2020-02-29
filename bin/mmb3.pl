@@ -146,6 +146,11 @@ sub get_name_from_dynamic_lib {
     return $name;
 }
 
+my @dylib_files = File::Find::Rule->file()
+                            ->name( '*.dylib' )
+                            ->in( @path );
+say join ' ', @dylib_files;
+
 # Search for a dynamic library
 # in the paths supplied. 
 sub find_dylib_in_path {
@@ -160,6 +165,8 @@ sub find_dylib_in_path {
 
     my $abs = "";
     my $dlext = $^O eq 'darwin' ? 'dylib' : $Config{dlext};
+    
+
     # setup regular expressions variables
     # Example of patterns
     # Search pattern for finding dynamic libraries.
