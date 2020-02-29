@@ -103,7 +103,7 @@ my @dylibs = (
     'libgeos_c.1.dylib',         'libgif.7.dylib', 
     'libjpeg.9.dylib',           'libgeotiff.5.dylib', 
     'libtiff.5.dylib',           'libspatialite.7.dylib', 
-    'libgeos-3.8.0.dylib',       'liblwgeom.dylib', 
+    'libgeos-3.8.0.dylib',       #'liblwgeom.dylib', 
     'libgnomecanvas-2.0.dylib',  'libart_lgpl_2.2.dylib', 
     'libgailutil.18.dylib',      'libfribidi.0.dylib',
     'libzstd.1.dylib',
@@ -327,7 +327,7 @@ sub build_dmg(){
     print "[build_dmg] Building dmg image...\n" if ($verbose);
     my $builddmg = Path::Class::dir ($root_dir,'bin', 'builddmg.pl' );
     print "[build_dmg] build_dmg: $builddmg\n" if ($verbose);
-    local $ENV{PERL5LIB} = "$script_root_dir/lib:$ENV{PERL5LIB}"
+    local $ENV{PERL5LIB} = "$script_root_dir/lib:$ENV{PERL5LIB}";
     my $build_results = `perl $builddmg`;
 }
 
