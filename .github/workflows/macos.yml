@@ -74,6 +74,8 @@ jobs:
           cpanm --notest Task::Biodiverse::NoGUI
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest ExtUtils::Depends
+          cpanm --notest Gtk2
+          cpanm --notest Gnome2::Canvas
           cpanm --notest Task::Biodiverse
           cpanm --notest PAR::Packer
           cpanm --notest File::BaseDir
