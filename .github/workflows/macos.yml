@@ -33,9 +33,9 @@ jobs:
       - name: Install GDAL and its deps
         run: brew install gdal
         
-      - name: Get lib names
-        run: |
-          find /usr/local/Cellar -name '*.dylib' -print
+      #- name: Get lib names
+      #  run: |
+      #    find /usr/local/Cellar -name '*.dylib' -print
       #    find /usr/local/Cellar -name 'libxml2*.dylib' -print
       #    find /usr/local/Cellar -name '*lwgeom*.dylib' -print
       #    find /usr/local/Cellar -name 'libsqlite3*.dylib' -print
