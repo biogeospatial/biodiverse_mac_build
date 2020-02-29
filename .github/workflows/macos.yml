@@ -81,6 +81,10 @@ jobs:
       
       - name: Install packer libs
         run: cpanm --notest PAR::Packer
-      
-      
         
+      - name: Clone biodiverse repo
+        run: git clone https://github.com/shawnlaffan/biodiverse.git
+        
+      - name: Check Biodiverse can run
+        run: prove -l biodiverse/t
+      
