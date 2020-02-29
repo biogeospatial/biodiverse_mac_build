@@ -23,7 +23,9 @@ if (1) {
     my @dylib_files_list
       = File::Find::Rule->file()
                         ->name( qr/\d\.dylib$/ )
-                        ->in( '/usr/local/opt' );
+                        ->in( '/usr/local/opt' )
+                        ->extras({ follow => 1 })  #  symlinks
+                        ;
     say '=====';
     say join "\n", @dylib_files_list;
     say '=====';
