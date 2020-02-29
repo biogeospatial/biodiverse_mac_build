@@ -33,8 +33,12 @@ jobs:
       - name: Install GDAL and its deps
         run: brew install gdal
         
-      - name: Get libproj name
-        run: ls -R /usr/local/Cellar/proj/6.3.1/lib
+      - name: Get lib names
+        run: |
+          ls /usr/local/Cellar/libgeotiff/1.5.1/lib/*.dylib
+          ls /usr/local/Cellar/libgeos/3.8.0/lib/*.dylib
+          find /usr/local/Cellar/ -name 'liblwgeom*.dylib'
+          
         
       - name: Install Gtk etc
         run: brew install gdk-pixbuf pango gtk+ gtk+3

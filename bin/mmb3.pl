@@ -103,7 +103,7 @@ my @dylibs = (
     'libgeos_c.1.dylib',         'libgif.7.dylib', 
     'libjpeg.9.dylib',           'libgeotiff.2.dylib', 
     'libtiff.5.dylib',           'libspatialite.7.dylib', 
-    'libgeos-3.7.0.dylib',       'liblwgeom.dylib', 
+    'libgeos-3.8.0.dylib',       'liblwgeom.dylib', 
     'libgnomecanvas-2.0.dylib',  'libart_lgpl_2.2.dylib', 
     'libgailutil.18.dylib',      'libfribidi.0.dylib',
     'libzstd.1.dylib',
