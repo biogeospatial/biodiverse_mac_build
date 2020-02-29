@@ -16,19 +16,6 @@ use File::Basename;
 use File::Find;
 use File::BaseDir qw/xdg_data_dirs/;
 
-use File::Find::Rule ();
-if (1) {
-    my @dylib_files_list
-      = File::Find::Rule->extras({ follow => 1, follow_skip=>2 })
-                        ->file()
-                        ->name( qr/\d\.dylib$/ )
-                        ->in( '/usr/local/opt' )
-                        ;
-    say '=====';
-    say join "\n", @dylib_files_list;
-    say '=====';
-}
-
 
 use Getopt::Long::Descriptive;
 
@@ -92,6 +79,22 @@ if (!-d $out_folder) {
 #  File::BOM dep are otherwise not found
 $ENV{BDV_PP_BUILDING}              = 1;
 $ENV{BIODIVERSE_EXTENSIONS_IGNORE} = 1;
+
+use File::Find::Rule ();
+our %dylib_files_hash;
+BEGIN {
+    my @dylib_files_list
+      = File::Find::Rule->extras({ follow => 1, follow_skip=>2 })
+                        ->file()
+                        ->name( qr/\d\.dylib$/ )
+                        ->in( '/usr/local/opt' )
+                        ;
+    say '=====';
+    say join "\n", @dylib_files_list;
+    say '=====';
+    
+    %dylib_files_hash = map {basename ($_) => $_} @dylib_files_list;
+}
 
 my @links;
 
@@ -174,6 +177,8 @@ sub find_dylib_in_path {
     # file and path.
     #return get_name_from_dynamic_lib($file) if -f $file;
     return $file if -f $file;
+
+    return $dylib_files_hash{$file} if $dylib_files_hash{$file};
     
     say "Checking for file $file";
 
