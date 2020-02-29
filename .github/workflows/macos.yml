@@ -56,6 +56,9 @@ jobs:
           perl -V > perlversion.txt
           ls -l perlversion.txt
 
+      - name: clear cache
+        run: rm ~/perl5/${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
+
       - name: Cache CPAN modules
         uses: actions/cache@v1
         with:
