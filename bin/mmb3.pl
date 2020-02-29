@@ -25,7 +25,7 @@ if (1) {
                         ->name( '*.dylib' )
                         ->in( '/usr/local/opt' );
     say '=====';
-    say join "\n", @dylib_files_list;
+    say join "\n", grep {/\d\.dylib$/} @dylib_files_list;
     say '=====';
 }
 
