@@ -24,7 +24,9 @@ if (1) {
       = File::Find::Rule->file()
                         ->name( '*.dylib' )
                         ->in( '/usr/local/opt' );
-    say join ' ', @dylib_files_list;
+    say '=====';
+    say join "\n", @dylib_files_list;
+    say '=====';
 }
 
 
