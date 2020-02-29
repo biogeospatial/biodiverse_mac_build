@@ -40,6 +40,8 @@ jobs:
         run: |
           brew install libgnomecanvas
           ls -lR /usr/local/Cellar/libgnomecanvas/2.30.3_4
+          ls -lR /usr/local/Cellar/libgnomecanvas/2.30.3_4/share
+          ls -lR /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib
         
       - name: Set up Perl
         run: |
