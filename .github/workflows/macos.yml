@@ -37,7 +37,9 @@ jobs:
         run: brew install gdk-pixbuf pango gtk+ gtk+3 libglade
       
       - name: Install libgnomecanvas
-        run: brew install libgnomecanvas
+        run: |
+          brew install libgnomecanvas
+          ls -l /usr/local/Cellar/libgnomecanvas/2.30.3_4
         
       - name: Set up Perl
         run: |
