@@ -36,7 +36,7 @@ jobs:
       - name: Install Gtk etc
         run: brew install gdk-pixbuf pango gtk+ gtk+3 libglade
       
-      - name: Install libgnomecanvas and cuckoo our patched version in
+      - name: Install libgnomecanvas and cuckoo our patched dylib across
         run: |
           brew install libgnomecanvas
           sudo cp libgnomecanvas-2.0.dylib /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib/libgnomecanvas-2.0.dylib
@@ -72,11 +72,10 @@ jobs:
       - name: Install Dynamic Dependencies
         run: |
           cpanm --notest Task::Biodiverse::NoGUI
-          which -a pkg-config
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest ExtUtils::Depends
           cpanm --notest Gtk2
-          cpanm -v Gnome2::Canvas
+          cpanm --notest Gnome2::Canvas
           cpanm --notest Task::Biodiverse
       
       - name: Install packer libs
@@ -85,6 +84,8 @@ jobs:
       - name: Clone biodiverse repo
         run: git clone https://github.com/shawnlaffan/biodiverse.git
         
-      - name: Check Biodiverse can run
-        run: prove -l biodiverse/t
+      #- name: Check Biodiverse can run
+      #  run: prove -l biodiverse/t
       
+      - name: Run mmb3.pl
+        run: perl bin/mmb3.pl --verbose
