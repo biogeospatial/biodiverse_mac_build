@@ -36,7 +36,7 @@ GetOptions(
     'input|i=s' => \$input,
     'app|a=s' => \$app,
     'mounted|m=s' => \$mounted,
-    'verbose|v=s' => \$verbose
+    'verbose|v!' => \$verbose
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -72,6 +72,7 @@ sub copy_new_app() {
     # Copies the new Biodiverse.app to the mounted read/write dmg image.
     # Default is ../builds/Biodiverse.app.
     print "copy $app into $input\n";
+    print "$app size is " . (-s $app); 
     my @copy_app_args = ("cp", "-r", "$app" , "$mounted");
     system(@copy_app_args) == 0
         or die "system @copy_app_args failed: $?";

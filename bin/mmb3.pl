@@ -89,9 +89,9 @@ BEGIN {
                         ->name( qr/\d\.dylib$/ )
                         ->in( '/usr/local/opt' )
                         ;
-    say '=====';
-    say join "\n", @dylib_files_list;
-    say '=====';
+    #say '=====';
+    #say join "\n", @dylib_files_list;
+    #say '=====';
     
     %dylib_files_hash = map {basename ($_) => $_} @dylib_files_list;
 }
@@ -180,7 +180,8 @@ sub find_dylib_in_path {
 
     return $dylib_files_hash{$file} if $dylib_files_hash{$file};
     
-    say "Checking for file $file";
+    #  fallback search
+    say "Searching for file $file";
 
     my $abs = "";
     my $dlext = $^O eq 'darwin' ? 'dylib' : $Config{dlext};
@@ -316,7 +317,7 @@ my @cmd = (
 );
 
 if ($verbose) {
-    my @verbose_command = ("-v=$verbose");
+    my @verbose_command = $verbose ? ("-v") : ();
     splice @cmd, 1, 0, @verbose_command;
 }
 
@@ -335,7 +336,7 @@ sub build_dmg(){
     my $builddmg = Path::Class::dir ($root_dir,'bin', 'builddmg.pl' );
     print "[build_dmg] build_dmg: $builddmg\n" if ($verbose);
     local $ENV{PERL5LIB} = "$script_root_dir/lib:$ENV{PERL5LIB}";
-    my $build_results = `perl $builddmg`;
+    my $build_results = `perl -v $builddmg`;
 }
 
 build_dmg();
