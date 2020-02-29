@@ -17,8 +17,14 @@ use File::Find;
 use File::BaseDir qw/xdg_data_dirs/;
 
 use File::Find::Rule;
-BEGIN {
-  our @dylib_files_list;
+#our @dylib_files_list;
+#if (!scalar @dylib_files_list) {
+if (1) {
+    my @dylib_files_list
+      = File::Find::Rule->file()
+                        ->name( '*.dylib' )
+                        ->in( '/usr/local/opt' );
+    say join ' ', @dylib_files_list;
 }
 
 
@@ -171,14 +177,6 @@ sub find_dylib_in_path {
 
     my $abs = "";
     my $dlext = $^O eq 'darwin' ? 'dylib' : $Config{dlext};
-    
-    if (!scalar @dylib_files_list) {
-        @dylib_files_list
-          = File::Find::Rule->file()
-                            ->name( '*.dylib' )
-                            ->in( '/usr/local/opt' );
-        say join ' ', @dylib_files_list;
-    }
 
     # setup regular expressions variables
     # Example of patterns
