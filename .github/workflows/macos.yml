@@ -91,5 +91,5 @@ jobs:
       #- name: Check Biodiverse can run
       #  run: prove -l biodiverse/t
       
-      #- name: Run mmb3.pl
-      #  run: perl bin/mmb3.pl -v 1 -s biodiverse/bin/BiodiverseGUI.pl 
+      - name: Run mmb3.pl
+        run: perl bin/mmb3.pl -v 1 -s biodiverse/bin/BiodiverseGUI.pl 
