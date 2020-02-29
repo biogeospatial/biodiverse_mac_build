@@ -56,8 +56,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
 
+      - name: Set LD_LIBRARY_PATH for libgnomecanvas
+        run: export LD_LIBRARY_PATH=`pwd`:${LD_LIBRARY_PATH}
+
       - name: Install Dynamic Dependencies
-        run: cpanm --notest Task::Biodiverse::NoGUI
+        run: |
+          cpanm --notest Task::Biodiverse::NoGUI
+          cpanm --notest Task::Biodiverse
       
       - name: Install packer libs
         run: cpanm --notest PAR::Packer
