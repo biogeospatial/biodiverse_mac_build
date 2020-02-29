@@ -36,11 +36,10 @@ jobs:
       - name: Install Gtk etc
         run: brew install gdk-pixbuf pango gtk+ gtk+3 libglade
       
-      - name: Install libgnomecanvas
+      - name: Install libgnomecanvas and cuckoo our patched version in
         run: |
           brew install libgnomecanvas
-          ls -lR /usr/local/Cellar/libgnomecanvas/2.30.3_4
-          ls -lR /usr/local/Cellar/libgnomecanvas/2.30.3_4/share
+          sudo cp libgnomecanvas-2.0.dylib /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib/libgnomecanvas-2.0.dylib
           ls -lR /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib
         
       - name: Set up Perl
