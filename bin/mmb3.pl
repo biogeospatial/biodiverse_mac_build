@@ -166,9 +166,12 @@ sub find_dylib_in_path {
     my $abs = "";
     my $dlext = $^O eq 'darwin' ? 'dylib' : $Config{dlext};
     
-    @dylib_files_list //= File::Find::Rule->file()
+    if (!@dylib_files_list) {
+        @dylib_files_list
+          = File::Find::Rule->file()
                             ->name( '*.dylib' )
                             ->in( @path );
+    }
 
     # setup regular expressions variables
     # Example of patterns
