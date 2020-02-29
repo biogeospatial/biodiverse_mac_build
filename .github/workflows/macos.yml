@@ -99,5 +99,8 @@ jobs:
       #- name: Check Biodiverse can run
       #  run: prove -l biodiverse/t
       
+      - name: Resize dmg file
+        run: hdiutil resize -size 75MB ./images/Biodiverse.dmg
+      
       - name: Run mmb3.pl
         run: perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl 
