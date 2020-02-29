@@ -5,6 +5,8 @@ use strict;
 use warnings;
 use English qw { -no_match_vars };
 
+local $| = 1;
+
 use Config;
 use File::Copy;
 use Path::Class;
@@ -25,7 +27,7 @@ my ($opt, $usage) = describe_options(
   [ 'pixbuf_loaders|p=s',      'The pixbuf loaders directory'],
   [ 'pixbuf_query_loader|q=s', 'The pixbuf query loader'],
   [ 'hicolor|h=s',             'The hicolor shared directory'],
-  [ 'verbose|v=i',              'Verbose building?', {default => 0} ],
+  [ 'verbose|v!',              'Verbose building?', {default => 0} ],
   [ 'execute|x!',              'Execute the script to find dependencies?', {default => 1} ],
   [ '-', 'Any arguments after this will be passed through to pp'],
   [],
@@ -38,7 +40,7 @@ if ($opt->help) {
 }
 
 my $script            = $opt->script;
-my $verbose           = $opt->verbose ? $opt->verbose : q{};
+my $verbose           = !!$opt->verbose;
 my $lib_paths         = $opt->lib_paths ? $opt->lib_paths : [q{/usr/local/opt}];
 my $execute           = $opt->execute ? '-x' : q{};
 my @pixbuf_loaders    = $opt->pixbuf_loaders ? $opt->pixbuf_loaders : q{/usr/local/opt/gdk-pixbuf/lib/gdk-pixbuf-2.0/2.10.0/loaders}; # need a way of finding this.
@@ -163,6 +165,8 @@ sub find_dylib_in_path {
     # file and path.
     #return get_name_from_dynamic_lib($file) if -f $file;
     return $file if -f $file;
+    
+    say "Checking for file $file";
 
     my $abs = "";
     my $dlext = $^O eq 'darwin' ? 'dylib' : $Config{dlext};
