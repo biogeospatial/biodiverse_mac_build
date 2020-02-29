@@ -22,10 +22,10 @@ use File::Find::Rule;
 if (1) {
     my @dylib_files_list
       = File::Find::Rule->file()
-                        ->name( '*.dylib' )
+                        ->name( qr/\d\.dylib$/ )
                         ->in( '/usr/local/opt' );
     say '=====';
-    say join "\n", grep {/\d\.dylib$/} @dylib_files_list;
+    say join "\n", @dylib_files_list;
     say '=====';
 }
 
