@@ -56,7 +56,7 @@ my $bin_folder = Path::Class::dir ($script_root_dir, 'bin');
 my $icon_file  = $opt->icon_file // Path::Class::file ($bin_folder, 'Biodiverse_icon.ico')->absolute->resolve;
 say "Icon file is $icon_file";
 
-my $out_folder   = $opt->out_folder // Path::Class::dir ($root_dir, 'etc','mmb','builds','Biodiverse.app','Contents','MacOS');
+my $out_folder   = $opt->out_folder // Path::Class::dir ($root_dir, 'builds','Biodiverse.app','Contents','MacOS');
 
 my $perlpath     = $EXECUTABLE_NAME;
 
@@ -307,7 +307,7 @@ system @cmd;
 ###########################################
 sub build_dmg(){
     print "[build_dmg] Building dmg image...\n" if ($verbose);
-    my $builddmg = Path::Class::dir ($root_dir, 'etc','mmb','bin', 'builddmg.pl' );
+    my $builddmg = Path::Class::dir ($root_dir,'bin', 'builddmg.pl' );
     print "[build_dmg] build_dmg: $builddmg\n" if ($verbose);
     my $build_results = `perl $builddmg`;
 }
