@@ -50,7 +50,7 @@ my @rest_of_pp_args   = @ARGV;
 
 #  assume bin folder is at parent folder level
 my $script_root_dir = Path::Class::file ($script)->dir->parent;
-my $root_dir = Path::Class::file ($0)->dir->parent->parent->parent;
+my $root_dir = Path::Class::file ($0)->dir->parent;
 say "Root dir is " . Path::Class::dir ($root_dir)->absolute->resolve;
 my $bin_folder = Path::Class::dir ($script_root_dir, 'bin');
 my $icon_file  = $opt->icon_file // Path::Class::file ($bin_folder, 'Biodiverse_icon.ico')->absolute->resolve;
