@@ -36,7 +36,7 @@ jobs:
       - name: Get lib names
         run: |
           ls /usr/local/Cellar/libgeotiff/1.5.1/lib/*.dylib
-          ls /usr/local/Cellar/libgeos/3.8.0/lib/*.dylib
+          ls /usr/local/Cellar/geos/3.8.0/lib/*.dylib
           find /usr/local/Cellar/ -name 'liblwgeom*.dylib'
           
         
