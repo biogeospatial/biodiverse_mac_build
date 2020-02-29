@@ -26,6 +26,7 @@ jobs:
         run: |
           pwd
           ls -l
+
       - name: Install pkgconfig
         run: brew install pkgconfig
 
@@ -59,13 +60,16 @@ jobs:
             ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
 
       - name: Set DYLD_LIBRARY_PATH for libgnomecanvas
-        run: export DYLD_LIBRARY_PATH=`pwd`:${LD_LIBRARY_PATH}
+        run: |
+          export DYLD_LIBRARY_PATH=`pwd`:${DYLD_LIBRARY_PATH}
+          export LD_LIBRARY_PATH=`pwd`:${LD_LIBRARY_PATH}
 
       - name: Install Dynamic Dependencies
         run: |
+          cpanm -v Gnome2::Canvas
           cpanm --notest Task::Biodiverse::NoGUI
           which -a pkg-config
-          cpanm --notest -v ExtUtils::PkgConfig
+          cpanm --notest ExtUtils::PkgConfig
           cpanm --notest Task::Biodiverse
       
       - name: Install packer libs
