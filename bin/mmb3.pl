@@ -16,6 +16,12 @@ use File::Basename;
 use File::Find;
 use File::BaseDir qw/xdg_data_dirs/;
 
+use File::Find::Rule;
+BEGIN {
+  our @dylib_files_list;
+}
+
+
 use Getopt::Long::Descriptive;
 
 my ($opt, $usage) = describe_options(
@@ -148,10 +154,6 @@ sub get_name_from_dynamic_lib {
     return $name;
 }
 
-use File::Find::Rule;
-BEGIN {
-  our @dylib_files_list;
-}
 
 # Search for a dynamic library
 # in the paths supplied. 
