@@ -66,10 +66,12 @@ jobs:
 
       - name: Install Dynamic Dependencies
         run: |
-          cpanm -v Gnome2::Canvas
           cpanm --notest Task::Biodiverse::NoGUI
           which -a pkg-config
           cpanm --notest ExtUtils::PkgConfig
+          cpanm --notest ExtUtils::Depends
+          cpanm --notest Gtk2
+          cpanm -v Gnome2::Canvas
           cpanm --notest Task::Biodiverse
       
       - name: Install packer libs
