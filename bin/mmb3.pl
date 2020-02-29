@@ -146,6 +146,7 @@ sub get_name_from_dynamic_lib {
     return $name;
 }
 
+use File::Find::Rule;
 our @dylib_files_list;
 END {
   say join ' ', @dylib_files_list;
