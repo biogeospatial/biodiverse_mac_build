@@ -13,6 +13,8 @@ use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 use Biodiverse::Config;
 
+local $| = 1;
+
 BEGIN {
     # Check to see if we are running on OS X.
     # and exit if we aren't.
@@ -22,7 +24,7 @@ BEGIN {
 my $bio_version = $Biodiverse::Config::VERSION;
 my $mac_build_version = 2;
 my $help;
-my $verbose;
+#my $verbose;
 my $man = 0;
 my $output  = catfile($FindBin::Bin, "..", "builds", "Biodiverse-$bio_version-$mac_build_version.dmg");
 my $input  = catfile($FindBin::Bin, "..", "images", "Biodiverse.dmg");
@@ -36,7 +38,7 @@ GetOptions(
     'input|i=s' => \$input,
     'app|a=s' => \$app,
     'mounted|m=s' => \$mounted,
-    'verbose|v!' => \$verbose
+    #'verbose|v' => \$verbose
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
