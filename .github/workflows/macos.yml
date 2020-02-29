@@ -54,6 +54,7 @@ jobs:
       - name: Prepare for cache
         run: |
           perl -V > perlversion.txt
+          cat 'extra text to change checksum' >> perlversion.txt
           ls -l perlversion.txt
 
       #- name: clear cache
