@@ -103,4 +103,9 @@ jobs:
         run: hdiutil resize -size 75MB ./images/Biodiverse.dmg
       
       - name: Run mmb3.pl
-        run: perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl 
+        run: perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl
+        
+      - uses: actions/upload-artifact@v1
+        with:
+          name: dmg-file
+          path: `find ./builds -name Biodiverse-*.dmg`
