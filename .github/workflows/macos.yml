@@ -104,5 +104,5 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: dmg-file
-          #path: `find ./builds -name Biodiverse-*.dmg`
-          path: Biodiverse-3.00-2.dmg
+          path: `find ./builds -name Biodiverse-*.dmg -print`
+          #path: Biodiverse-3.00-2.dmg
