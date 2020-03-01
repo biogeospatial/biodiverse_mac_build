@@ -336,7 +336,7 @@ sub build_dmg(){
     my $builddmg = Path::Class::dir ($root_dir,'bin', 'builddmg.pl' );
     print "[build_dmg] build_dmg: $builddmg\n" if ($verbose);
     local $ENV{PERL5LIB} = "$script_root_dir/lib:$ENV{PERL5LIB}";
-    my $build_results = `perl $builddmg`;
+    system ('perl', $builddmg);
 }
 
 build_dmg();
