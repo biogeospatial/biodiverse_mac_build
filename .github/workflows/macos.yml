@@ -100,9 +100,12 @@ jobs:
       - name: Run mmb3.pl
         run: perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl
         
+      - name: Find dmg file
+        run: export DMG_FILE_NAME=`find ./builds -name Biodiverse-*.dmg -print`
+        
       - name: Upload artefact
         uses: actions/upload-artifact@v1
         with:
           name: dmg-file
-          path: `find ./builds -name Biodiverse-*.dmg -print`
+          path: ${DMG_FILE_NAME}
           #path: Biodiverse-3.00-2.dmg
