@@ -242,13 +242,14 @@ sub create_lib_paths {
 #
 ###########################################
 my @add_files;
-my $mime_dir;
+my @mime_dirs;
 
 sub get_xdg_data_dirs(){
     my @xdg_data_dirs = xdg_data_dirs;
     for my $dir (@xdg_data_dirs){
         if ( -d $dir . "/mime" ) {
-            $mime_dir = $dir . "/mime";
+            say "Found mime dir $dir" if $verbose;
+            push @mime_dirs, $dir . "/mime";
         }
     }
 }
@@ -256,9 +257,9 @@ sub get_xdg_data_dirs(){
 get_xdg_data_dirs();
 
 
-for my $dir ($mime_dir) {
+for my $dir (@mime_dirs) {
     my $mime_dir_abs  = Path::Class::file ($dir)->basename;
-    push @add_files, ('-a', "$mime_dir\;$mime_dir_abs");  
+    push @add_files, ('-a', "$dir\;$mime_dir_abs");  
 }
 
 # Add the pixbuf loaders directory
