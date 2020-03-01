@@ -76,11 +76,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
 
-      #- name: Set DYLD_LIBRARY_PATH for libgnomecanvas
-      #  run: |
-      #    export DYLD_LIBRARY_PATH=`pwd`:${DYLD_LIBRARY_PATH}
-      #    export LD_LIBRARY_PATH=`pwd`:${LD_LIBRARY_PATH}
-
       - name: Install cpan deps 
         run: |
           cpanm --notest Task::Biodiverse::NoGUI
