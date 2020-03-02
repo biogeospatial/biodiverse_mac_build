@@ -131,11 +131,15 @@ my @dylibs = qw {
     libnetcdf.15.dylib        libhdf5.103.dylib
     libcfitsio.8.dylib
     libdap.25.dylib           libdapserver.7.dylib
-    libdapclient.6.dylib
+    libdapclient.6.dylib      libcurl.4.dylib 
+    libopenjp2.7.dylib        libcfitsio.8.dylib
     /usr/local/Cellar/libxml2/2.9.10/lib/libxml2.2.dylib
-    /usr/local/Cellar/sqlite/3.31.1/lib/libsqlite3.0.dylib
+    libsqlite3.0.dylib
     libgraphite2.3.dylib
 };
+#  moved out:
+#  /usr/local/Cellar/sqlite/3.31.1/lib/libsqlite3.0.dylib
+
 
 # Find the absolute paths to each supplied
 # dynamic library. Each library is supplied
