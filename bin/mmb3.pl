@@ -311,9 +311,12 @@ my @icon_file_arg  = $icon_file ? ('-a', "$icon_file\;$icon_file_base") : ();
 $ENV{DYLD_LIBRARY_PATH} = $dyld_library_path;
 $ENV{LD_LIBRARY_PATH} = $ld_library_path;
 
+#  we need to use -M with the aliens,
+#  and possibly some others
 my @aliens = qw /
     Alien::gdal       Alien::geos::af
     Alien::proj       Alien::sqlite
+    File::ShareDir
 /;
 #    Alien::spatialite Alien::freexl
 #/;
