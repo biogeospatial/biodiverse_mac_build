@@ -158,7 +158,7 @@ jobs:
       - name: Upload checkpp artefact
         uses: actions/upload-artifact@v1
         with:
-          name: dmg-file
+          name: checkpp
           #path: ${DMG_FILE_NAME}
           path: ./checkpp
 
