@@ -149,6 +149,9 @@ jobs:
         run: |
           export DMG_FILE_NAME=`find ./builds -name Biodiverse-*.dmg -print`
           echo ${DMG_FILE_NAME}
+      #    
+      #- name: Try to run the app
+      #  run: ./builds/Biodiverse.app
         
       - name: Upload artefact
         uses: actions/upload-artifact@v1

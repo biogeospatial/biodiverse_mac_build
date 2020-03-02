@@ -299,6 +299,13 @@ my @icon_file_arg  = $icon_file ? ('-a', "$icon_file\;$icon_file_base") : ();
 $ENV{DYLD_LIBRARY_PATH} = $dyld_library_path;
 $ENV{LD_LIBRARY_PATH} = $ld_library_path;
 
+my @aliens = qw /
+    Alien::gdal       Alien::geos::af
+    Alien::proj       Alien::sqlite
+    Alien::spatialite Alien::freexl
+/;
+push @rest_of_pp_args, map {; '-M' => $_} @aliens;
+
 my @cmd = (
     'pp',
     #$verbose,
