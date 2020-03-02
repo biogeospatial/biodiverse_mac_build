@@ -302,8 +302,9 @@ $ENV{LD_LIBRARY_PATH} = $ld_library_path;
 my @aliens = qw /
     Alien::gdal       Alien::geos::af
     Alien::proj       Alien::sqlite
-    Alien::spatialite Alien::freexl
 /;
+#    Alien::spatialite Alien::freexl
+#/;
 #  we don't always have all of the aliens installed
 foreach my $alien (@aliens) {
     if (eval "require $alien") {
