@@ -124,7 +124,8 @@ jobs:
 
       - name: Install cpan deps 
         run: |
-          ALIEN_INSTALL_TYPE=share cpanm Alien::gdal
+          ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::sqlite
+          ALIEN_INSTALL_TYPE=share cpanm --notest Alien::gdal
           cpanm --notest Task::Biodiverse::NoGUI
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest ExtUtils::Depends
