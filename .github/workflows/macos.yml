@@ -149,11 +149,11 @@ jobs:
           pp -M Alien::gdal -M Alien::proj -M Alien::geos::af -M Alien::sqlite -M FFI::CheckLib -e 'use 5.020; use Alien::gdal; say join ":", Alien::gdal->dynamic_libs' -o checkpp
           echo Running checkpp dynamic libs check
           ./checkpp
-          echo Running checkpp with /usr/local/opt out of the way
-          sudo mv /usr/local/lib /usr/local/libx
+          echo Running checkpp with /usr/local out of the way
+          sudo mv /usr/local/lib /usr/localx
           ./checkpp
-          echo Putting /usr/local/opt back
-          sudo mv /usr/local/libx /usr/local/lib
+          echo Putting /usr/local back
+          sudo mv /usr/localx /usr/local
           
       - name: Alien O'Toole
         run: |
