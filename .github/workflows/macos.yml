@@ -136,7 +136,7 @@ jobs:
       - name: Test pack
         run: |
           ls -l /usr/local/lib/../Cellar/gdal/2.4.4/lib/libgdal.20.dylib
-          ls -l /usr/local/opt/gdal/2.4.4/lib/libgdal.20.dylib
+          #ls -l /usr/local/opt/gdal/2.4.4/lib/libgdal.20.dylib
           echo Running perl dynamic_libs check
           perl -e 'use Alien::gdal; warn Alien::gdal->dynamic_libs; warn FFI::CheckLib::find_lib_or_die(lib => "gdal")'
           pp -v -M Alien::gdal -M Alien::proj -M Alien::geos::af -M Alien::sqlite -M FFI::CheckLib -e 'use Alien::gdal; warn Alien::gdal->dynamic_libs; warn FFI::CheckLib::find_lib_or_die(lib => "gdal")' -o checkpp
