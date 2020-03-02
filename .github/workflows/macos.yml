@@ -151,7 +151,7 @@ jobs:
           echo ${DMG_FILE_NAME}
           
       - name: Try to run the app
-        run: ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
+        run: BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
         
       - name: Upload artefact
         uses: actions/upload-artifact@v1
