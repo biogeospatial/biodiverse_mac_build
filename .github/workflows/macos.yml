@@ -124,9 +124,11 @@ jobs:
 
       - name: Install cpan deps 
         run: |
+          #  no share install for Alien::MSYS
           cpanm --notest Alien::MSYS
-          ALIEN_INSTALL_TYPE=share cpanm --notest Alien::sqlite
-          ALIEN_INSTALL_TYPE=share cpanm --notest Alien::gdal
+          #  ensure share install for gdal et al
+          ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
+          ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
           cpanm --notest Task::Biodiverse::NoGUI
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest ExtUtils::Depends
