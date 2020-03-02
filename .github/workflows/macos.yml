@@ -150,7 +150,7 @@ jobs:
           echo Running checkpp dynamic libs check
           ./checkpp
           echo Running checkpp with /usr/local out of the way
-          sudo mv /usr/local/lib /usr/localx
+          sudo mv /usr/local /usr/localx
           ./checkpp
           echo Putting /usr/local back
           sudo mv /usr/localx /usr/local
