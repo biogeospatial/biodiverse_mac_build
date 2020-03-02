@@ -145,8 +145,8 @@ jobs:
           #ls -l /usr/local/lib/../Cellar/gdal/2.4.4/lib/libgdal.20.dylib
           #ls -l /usr/local/opt/gdal/2.4.4/lib/libgdal.20.dylib
           echo Running perl dynamic_libs check
-          perl -e 'use Geo::GDAL::FFI; print join ":", Alien::gdal->dynamic_libs'
-          pp -M Alien::gdal -M Alien::proj -M Alien::geos::af -M Alien::sqlite -M FFI::CheckLib -e 'use Alien::gdal; print join ":", Alien::gdal->dynamic_libs' -o checkpp
+          perl -e 'use 5.020; use Geo::GDAL::FFI; say join ":", Alien::gdal->dynamic_libs'
+          pp -M Alien::gdal -M Alien::proj -M Alien::geos::af -M Alien::sqlite -M FFI::CheckLib -e 'use 5.020; use Alien::gdal; say join ":", Alien::gdal->dynamic_libs' -o checkpp
           echo Running checkpp dynamic libs check
           ./checkpp
           echo Running checkpp with /usr/local/opt out of the way
@@ -154,6 +154,17 @@ jobs:
           ./checkpp
           echo Putting /usr/local/opt back
           sudo mv /usr/local/libx /usr/local/lib
+          
+      - name: Alien O'Toole
+        run: |
+          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-gdal/lib/libgdal.dylib
+          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-gdal/lib/libgdal.26.dylib
+          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-geos-af/lib/libgeos.dylib
+          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-geos-af/lib/libgeos_c.dylib
+          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-sqlite/lib/libsqlite3.dylib
+          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-sqlite/lib/libsqlite3.0.dylib
+          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-proj/lib/libproj.dylib
+          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-proj/lib/libproj.19.dylib
         
       - name: Upload checkpp artefact
         uses: actions/upload-artifact@v1
