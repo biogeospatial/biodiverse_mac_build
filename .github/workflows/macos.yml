@@ -134,7 +134,9 @@ jobs:
           cpanm --notest File::Find::Rule
       
       - name: Test pack
-        run: perl -MFFI::CheckLib -E'say FFI::CheckLib::find_lib_or_die(lib => "gdal")'
+        run: |
+          pp -M Alien::gdal -M Alien::proj -M Alien::geos::af -M Alien::spatialite -M FFI::CheckLib -e'say FFI::CheckLib::find_lib_or_die(lib => "gdal")' checkpp
+          ./checkpp
         
       - name: Clone biodiverse repo
         run: git clone https://github.com/shawnlaffan/biodiverse.git
@@ -160,7 +162,7 @@ jobs:
           #  we need the brewed libs out of the way for this check
           echo Moving /usr/local/opt
           sudo mv /usr/local/opt /usr/local/optx
-          BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
+          #BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
           echo Returning /usr/local/opt
           sudo mv /usr/local/optx /usr/local/opt
           
