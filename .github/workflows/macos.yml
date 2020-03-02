@@ -132,6 +132,9 @@ jobs:
           cpanm --notest PAR::Packer
           cpanm --notest File::BaseDir
           cpanm --notest File::Find::Rule
+      
+      - name: Test pack
+        run: perl -MFFI::CheckLib -E'say FFI::CheckLib::find_lib_or_die(lib => "gdal")'
         
       - name: Clone biodiverse repo
         run: git clone https://github.com/shawnlaffan/biodiverse.git
