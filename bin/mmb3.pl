@@ -114,7 +114,8 @@ my @dylibs = (
     'libgtk-quartz-2.0.0.dylib', 'libgdk-quartz-2.0.0.dylib', 
     'libatk-1.0.0.dylib',        'libgdk_pixbuf-2.0.0.dylib', 
     'libgio-2.0.0.dylib',        'libgmodule-2.0.0.dylib', 
-    'libssl.1.0.0.dylib',        'libcrypto.1.0.0.dylib', 
+    'libssl.1.0.0.dylib',        'libwebp.7.dylib',
+    'libcrypto.1.0.0.dylib',     'libcrypto.1.1.dylib',
     'libproj.15.dylib',          'libpq.5.dylib',
     'libjson-c.4.dylib',         'libfreexl.1.dylib', 
     'libgeos_c.1.dylib',         'libgif.7.dylib', 
@@ -124,6 +125,13 @@ my @dylibs = (
     'libgnomecanvas-2.0.dylib',  'libart_lgpl_2.2.dylib', 
     'libgailutil.18.dylib',      'libfribidi.0.dylib',
     'libzstd.1.dylib',           'libxerces-c-3.2.dylib',
+    'libepsilon.1.dylib',        'libjasper.4.dylib',
+    'libodbc.2.dylib',           'libodbcinst.2.dylib',
+    'libexpat.1.dylib',          'libxerces-c-3.2.dylib',
+    'libnetcdf.15.dylib',        'libhdf5.103.dylib',
+    'libcfitsio.8.dylib',
+    'libdap.25.dylib',           'libdapserver.7.dylib',
+    'libdapclient.6.dylib',
     '/usr/local/Cellar/libxml2/2.9.10/lib/libxml2.2.dylib', 
     '/usr/local/Cellar/sqlite/3.31.1/lib/libsqlite3.0.dylib', 
     'libgraphite2.3.dylib',
@@ -136,11 +144,14 @@ my @dylibs = (
 # Par:Packer archive. This is where the 
 # Biodiverse binary will be able to find it.
 print "finding dynamic library paths\n";
-for my $name (@dylibs){
+my %checked_dylib;
+for my $name (@dylibs) {
+    next if $checked_dylib{$name};  
     my $lib = find_dylib_in_path($name, @$lib_paths);
     my $filename = Path::Class::file ($name)->basename;
     push @links, '-a', "$lib\;../$filename";
     print "library $lib will be included as ../$filename\n" if ($verbose);
+    $checked_dylib{$name}++;
 }
 
 # Setup the paths to export

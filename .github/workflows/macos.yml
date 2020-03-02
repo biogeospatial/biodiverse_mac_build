@@ -153,8 +153,10 @@ jobs:
       - name: Try to run the app
         run: |
           #  we need the brewed libs out of the way for this check
+          echo Moving /usr/local/opt
           sudo mv /usr/local/opt /usr/local/optx
           BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
+          echo Returning /usr/local/opt
           sudo mv /usr/local/optx /usr/local/opt
           
         
