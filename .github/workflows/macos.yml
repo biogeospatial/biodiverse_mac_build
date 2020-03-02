@@ -135,8 +135,9 @@ jobs:
       
       - name: Test pack
         run: |
-          perl -MAlien::gdal -e 'warn Alien::gdal->dynamic_libs; warn FFI::CheckLib::find_lib_or_die(lib => "gdal")'
-          pp -M Alien::gdal -M Alien::proj -M Alien::geos::af -M Alien::sqlite -M FFI::CheckLib -e 'warn Alien::gdal->dynamic_libs; warn FFI::CheckLib::find_lib_or_die(lib => "gdal")' -o checkpp
+          perl -e 'use Alien::gdal; warn Alien::gdal->dynamic_libs; warn FFI::CheckLib::find_lib_or_die(lib => "gdal")'
+          pp -v -M Alien::gdal -M Alien::proj -M Alien::geos::af -M Alien::sqlite -M FFI::CheckLib -e 'use Alien::gdal; warn Alien::gdal->dynamic_libs; warn FFI::CheckLib::find_lib_or_die(lib => "gdal")' -o checkpp
+          echo Running checkpp
           ./checkpp
         
       - name: Clone biodiverse repo
