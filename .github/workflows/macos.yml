@@ -31,11 +31,7 @@ jobs:
         run: brew install pkgconfig
 
       - name: Install GDAL and its deps
-        run: |
-          brew install gdal
-          brew install libpq
-          #brew install postgresql
-          find /usr/local/opt -name libpq-fe.h -print
+        run: brew install gdal
         
       #- name: Get lib names
       #  run: |
@@ -132,7 +128,8 @@ jobs:
           cpanm --notest Alien::MSYS
           #  ensure share install for gdal et al
           ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
-          ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
+          #ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
+          ALIEN_INSTALL_TYPE=share cpanm --notest -v https://github.com/shawnlaffan/perl-alien-gdal.git
           cpanm --notest Task::Biodiverse::NoGUI
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest ExtUtils::Depends
