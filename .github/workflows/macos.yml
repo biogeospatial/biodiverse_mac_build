@@ -107,7 +107,8 @@ jobs:
       - name: Prepare for cache
         run: |
           perl -V > perlversion.txt
-          echo 'extra text to change checksum' >> perlversion.txt
+          #  change the checksum so we refresh the cache
+          echo 'with shared Alien installs' >> perlversion.txt
           ls -l perlversion.txt
 
       #- name: clear cache
@@ -123,6 +124,7 @@ jobs:
 
       - name: Install cpan deps 
         run: |
+          ALIEN_INSTALL_TYPE=share cpanm Alien::gdal
           cpanm --notest Task::Biodiverse::NoGUI
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest ExtUtils::Depends
@@ -142,11 +144,11 @@ jobs:
           pp -v -M Alien::gdal -M Alien::proj -M Alien::geos::af -M Alien::sqlite -M FFI::CheckLib -e 'use Alien::gdal; warn Alien::gdal->dynamic_libs; warn FFI::CheckLib::find_lib_or_die(lib => "gdal")' -o checkpp
           echo Running checkpp dynamic libs check
           ./checkpp
-          echo Running checkpp with /usr/local/opt out of the way
-          sudo mv /usr/local/lib /usr/local/libx
-          ./checkpp
-          echo Putting /usr/local/opt back
-          sudo mv /usr/local/libx /usr/local/lib
+          #echo Running checkpp with /usr/local/opt out of the way
+          #sudo mv /usr/local/lib /usr/local/libx
+          #./checkpp
+          #echo Putting /usr/local/opt back
+          #sudo mv /usr/local/libx /usr/local/lib
         
       - name: Clone biodiverse repo
         run: git clone https://github.com/shawnlaffan/biodiverse.git
