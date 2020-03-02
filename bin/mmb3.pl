@@ -304,7 +304,12 @@ my @aliens = qw /
     Alien::proj       Alien::sqlite
     Alien::spatialite Alien::freexl
 /;
-push @rest_of_pp_args, map {; '-M' => $_} @aliens;
+#  we don't always have all of the aliens installed
+foreach my $alien (@aliens) {
+    if (eval "require $alien") {
+        push @rest_of_pp_args, '-M' => $alien;
+    }
+}
 
 my @cmd = (
     'pp',
