@@ -145,8 +145,9 @@ my @dylibs = (
 # Biodiverse binary will be able to find it.
 print "finding dynamic library paths\n";
 my %checked_dylib;
-for my $name (@dylibs) {
-    next if $checked_dylib{$name};  
+for my $name (sort @dylibs) {
+    next if $checked_dylib{$name};
+    say "Checking location of $name";
     my $lib = find_dylib_in_path($name, @$lib_paths);
     my $filename = Path::Class::file ($name)->basename;
     push @links, '-a', "$lib\;../$filename";
