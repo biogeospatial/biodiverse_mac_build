@@ -179,7 +179,7 @@ jobs:
           #  we need the brewed libs out of the way for this check
           echo Moving /usr/local/lib
           sudo mv /usr/local/lib /usr/local/libx
-          #BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
+          BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
           echo Returning /usr/local/lib
           sudo mv /usr/local/libx /usr/local/lib
           
