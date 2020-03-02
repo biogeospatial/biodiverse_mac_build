@@ -155,6 +155,13 @@ jobs:
           echo Putting /usr/local/opt back
           sudo mv /usr/local/libx /usr/local/lib
         
+      - name: Upload checkpp artefact
+        uses: actions/upload-artifact@v1
+        with:
+          name: dmg-file
+          #path: ${DMG_FILE_NAME}
+          path: ./checkpp
+
       - name: Clone biodiverse repo
         run: git clone https://github.com/shawnlaffan/biodiverse.git
         
