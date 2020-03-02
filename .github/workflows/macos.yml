@@ -34,7 +34,7 @@ jobs:
         run: |
           brew install gdal
           brew install libpq
-          brew install postgresql
+          #brew install postgresql
         
       #- name: Get lib names
       #  run: |
