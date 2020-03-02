@@ -135,7 +135,7 @@ jobs:
       
       - name: Test pack
         run: |
-          pp -M Alien::gdal -M Alien::proj -M Alien::geos::af -M Alien::spatialite -M FFI::CheckLib -e'say FFI::CheckLib::find_lib_or_die(lib => "gdal")' checkpp
+          pp -M Alien::gdal -M Alien::proj -M Alien::geos::af -M Alien::sqlite -M FFI::CheckLib -e'say FFI::CheckLib::find_lib_or_die(lib => "gdal")' checkpp
           ./checkpp
         
       - name: Clone biodiverse repo
