@@ -37,8 +37,8 @@ while (my $lib = shift @target_libs) {
         my $dylib = $1;
         next if $seen{$dylib};
         next if $dylib =~ m{^/System};
-        next if $dylib =~ m{^/usr/lib/system};
-        next if $dylib =~ m{^/usr/lib/libsystem};
+        #next if $dylib =~ m{^/usr/lib/system};
+        #next if $dylib =~ m{^/usr/lib/libsystem};
         next if $dylib =~ m{\Qdarwin-thread-multi-2level/auto/share/dist/Alien\E};  #  another alien
         say "adding $dylib for $lib";
         push @libs_to_pack, $dylib;
