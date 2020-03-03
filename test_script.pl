@@ -4,7 +4,7 @@ use warnings;
 
 use Alien::gdal;
 
-eval 'use Geo::GDAL::FFI'
+eval 'require Geo::GDAL::FFI'
   or warn "unable to load Geo::GDAL::FFI";
 
 say join "\n", Alien::gdal->dynamic_libs;
