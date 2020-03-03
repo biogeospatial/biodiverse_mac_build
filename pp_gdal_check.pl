@@ -10,7 +10,7 @@ my %seen;
 
 foreach my $lib (Alien::gdal->dynamic_libs) {
     say "otool -L $lib"; 
-    my $libs = system ('otool', '-L', $lib);
+    my $libs = `otool -L $lib`;
     my @lib_arr = split "\n", $libs;
     shift @lib_arr;  #  first result is alien dylib
     foreach my $line (@lib_arr) {
