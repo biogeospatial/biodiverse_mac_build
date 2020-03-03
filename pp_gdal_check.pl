@@ -8,7 +8,7 @@ use Alien::gdal;
 my @libs_to_pack;
 my %seen;
 
-foreach my $lib (Alien::gdal->dynamic_libs) {
+foreach my $lib (Alien::gdal->dynamic_libs, '/usr/local/opt/libffi/lib/libffi.6.dylib') {
     say "otool -L $lib"; 
     my $libs = `otool -L $lib`;
     my @lib_arr = split "\n", $libs;
@@ -25,6 +25,7 @@ foreach my $lib (Alien::gdal->dynamic_libs) {
 }
 
 my @inc_to_pack = map {('--link' => $_)} @libs_to_pack;
+push @inc_to_pack, ('--link' => '/usr/local/opt/libffi/lib/libffi.6.dylib');
 
 my @pp_cmd = (
     'pp',
