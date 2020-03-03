@@ -52,14 +52,18 @@ while (my $lib = shift @target_libs) {
 #my @inc_to_pack
 #  = map {('--link' => $_)}
 #    (@libs_to_pack, '/usr/local/opt/libffi/lib/libffi.6.dylib');
+my @inc_to_pack;
 foreach my $file (@libs_to_pack) {
+    my $basename = Path::Tiny::path($file)->basename;
     if (-l $file) {
         say "$file is a symbolic link";
+        $file = _chase_lib_darwin($file);
     }
+    push @inc_to_pack, ("-a" => "$file\;../" . $basename);
 }
-my @inc_to_pack
-  = map {("-a" => "$_\;../" . Path::Tiny::path($_)->basename)}
-    (@libs_to_pack, '/usr/local/opt/libffi/lib/libffi.6.dylib');
+#my @inc_to_pack
+#  = map {("-a" => "$_\;../" . Path::Tiny::path($_)->basename)}
+#    (@libs_to_pack, '/usr/local/opt/libffi/lib/libffi.6.dylib');
 
 my @pp_cmd = (
     'pp',
@@ -142,3 +146,32 @@ sub get_dep_dlls {
     return wantarray ? @dll_list : \@dll_list;
 }
 
+#  adapted from PAR::Packer
+sub _chase_lib_darwin {
+   my ($file) = @_;
+
+   $file = path($file)->absolute;
+
+   while (-l $file) {
+       if ($file =~ /^(.*?\.\d+)(\.\d+)*\.dylib$/) {
+           my $name = $1 . q/.dylib/;
+           return $name if -e $name;
+       }
+
+       return $file if $file =~ /\D\.\d+\.dylib$/;
+
+       my $dir = path($file)->parent->stringify;
+       $file = readlink($file);
+
+       unless (path($file)->is_absolute) {
+           $file = path("$dir/$file")->realpath;
+       }
+   }
+
+   if ($file =~ /^(.*?\.\d+)(\.\d+)*\.dylib$/) {
+       my $name = $1 . q/.dylib/;
+       return $name if -e $name;
+   }
+
+   return $file;
+}
