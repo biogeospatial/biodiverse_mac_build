@@ -8,7 +8,7 @@ use Alien::gdal;
 my @libs_to_pack;
 my %seen;
 
-my @target_libs = Alien::gdal->dynamic_libs, '/usr/local/opt/libffi/lib/libffi.6.dylib';
+my @target_libs = (Alien::gdal->dynamic_libs, '/usr/local/opt/libffi/lib/libffi.6.dylib');
 while (my $lib = shift @target_libs) {
     say "otool -L $lib"; 
     my $libs = `otool -L $lib`;
@@ -20,6 +20,7 @@ while (my $lib = shift @target_libs) {
         next if $seen{$dylib};
         next if $dylib =~ m{^/System};
         next if $dylib =~ m{^/usr/lib/system};
+        next if $dylib =~ m{^/usr/lib/libsystem};
         next if $dylib =~ m{darwin-thread-multi-2level/auto/share/dist/Alien};  #  another alien
         say "adding $dylib for $lib";
         push @libs_to_pack, $dylib;
