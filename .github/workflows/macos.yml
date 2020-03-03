@@ -144,7 +144,17 @@ jobs:
         run: |
           echo "========"
           perl pp_gdal_check.pl
+          echo "========"
+          echo Running packed exe
           ./pp_gdal_check
+          echo "========"
+          echo Running with /usr/local dirs out of the way
+          sudo mv /usr/local/opt /usr/local/optx
+          sudo mv /usr/local/Cellar /usr/local/Cellarx
+          ./pp_gdal_check
+          echo Putting /usr/local dirs back
+          sudo mv /usr/local/optx /usr/local/opt
+          sudo mv /usr/local/Cellarx /usr/local/Cellar
           echo "========"
           
       - name: Upload checkpp artefact
