@@ -17,17 +17,16 @@ my $target_script = 'test_script.pl';
 
 
 say '+++++';
+say 'Finding XS bundle files';
 my @bundle_list = get_dep_dlls($target_script);
-say join ' ', @bundle_list;
-system ('otool', '-L', $bundle_list[0]);
+#say join ' ', @bundle_list;
+#system ('otool', '-L', $bundle_list[0]);
 say '+++++';
 
-
-#say join ":", Alien::gdal->dynamic_libs;
 my @libs_to_pack;
 my %seen;
 
-my @target_libs = (Alien::gdal->dynamic_libs, '/usr/local/opt/libffi/lib/libffi.6.dylib');
+my @target_libs = (Alien::gdal->dynamic_libs, @bundle_list, '/usr/local/opt/libffi/lib/libffi.6.dylib');
 while (my $lib = shift @target_libs) {
     say "otool -L $lib"; 
     my $libs = `otool -L $lib`;
@@ -40,7 +39,7 @@ while (my $lib = shift @target_libs) {
         next if $dylib =~ m{^/System};
         next if $dylib =~ m{^/usr/lib/system};
         next if $dylib =~ m{^/usr/lib/libsystem};
-        next if $dylib =~ m{darwin-thread-multi-2level/auto/share/dist/Alien};  #  another alien
+        next if $dylib =~ m{\Qdarwin-thread-multi-2level/auto/share/dist/Alien\E};  #  another alien
         say "adding $dylib for $lib";
         push @libs_to_pack, $dylib;
         $seen{$dylib}++;
