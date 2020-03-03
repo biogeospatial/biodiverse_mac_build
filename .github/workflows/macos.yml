@@ -146,6 +146,13 @@ jobs:
           perl pp_gdal_check.pl
           ./pp_gdal_check
           echo "========"
+          
+      - name: Upload checkpp artefact
+        uses: actions/upload-artifact@v1
+        with:
+          name: pp_gdal_check
+          #path: ${DMG_FILE_NAME}
+          path: ./pp_gdal_check
       
       - name: Test pack
         run: |
