@@ -52,6 +52,11 @@ while (my $lib = shift @target_libs) {
 #my @inc_to_pack
 #  = map {('--link' => $_)}
 #    (@libs_to_pack, '/usr/local/opt/libffi/lib/libffi.6.dylib');
+foreach my $file (@libs_to_pack) {
+    if (-l $file) {
+        say "$file is a symbolic link";
+    }
+}
 my @inc_to_pack
   = map {("-a" => "$_\;../" . Path::Tiny::path($_)->basename)}
     (@libs_to_pack, '/usr/local/opt/libffi/lib/libffi.6.dylib');
