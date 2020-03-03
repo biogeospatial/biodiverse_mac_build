@@ -2,6 +2,14 @@ use 5.020;
 use strict;
 use warnings;
 use Carp;
+use File::Which      qw( which );
+use Capture::Tiny    qw/ capture /;
+use List::Util       qw( uniq any );
+use File::Find::Rule qw/ rule find /;
+use Path::Tiny       qw/ path /;
+use Cwd              qw/ abs_path /;
+use File::Temp       qw/ tempfile /;
+use Module::ScanDeps;
 
 use Alien::gdal;
 
