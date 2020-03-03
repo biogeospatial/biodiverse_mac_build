@@ -5,9 +5,11 @@ use Carp;
 
 use Alien::gdal;
 
+my $target_script = 'test_script.pl';
+
 
 say '+++++';
-my @bundle_list = get_dep_dlls();
+my @bundle_list = get_dep_dlls($target_script);
 say join ' ', @bundle_list;
 system ('otool', '-L', $bundle_list[0]);
 say '+++++';
@@ -52,7 +54,7 @@ my @pp_cmd = (
     @inc_to_pack,
     '-o',
     'pp_gdal_check',
-    'test_script.pl',
+    $target_script,
 );
 
 
