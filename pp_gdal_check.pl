@@ -17,6 +17,7 @@ foreach my $lib (Alien::gdal->dynamic_libs) {
         $line =~ /^\s+(.+?)\s/;
         my $dylib = $1;
         next if $seen{$dylib};
+        next if $dylib =~ m{^/System};
         say "adding $dylib for $lib";
         push @libs_to_pack, $dylib;
         $seen{$dylib}++;
