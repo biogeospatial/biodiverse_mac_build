@@ -24,8 +24,9 @@ foreach my $lib (Alien::gdal->dynamic_libs) {
 
 my @inc_to_pack = map {('--link' => $_)} @libs_to_pack;
 
-system (
+my @pp_cmd = (
     'pp',
+    '-v',
     '-u',
     '-B',
     '-x',
@@ -34,3 +35,7 @@ system (
     'pp_gdal_check',
     'pp_gdal_check.pl',
 );
+
+
+say join ' ', @pp_cmd;
+system (@pp_cmd);
