@@ -8,7 +8,8 @@ use Alien::gdal;
 my @libs_to_pack;
 my %seen;
 
-foreach my $lib (Alien::gdal->dynamic_libs, '/usr/local/opt/libffi/lib/libffi.6.dylib') {
+my @target_libs = Alien::gdal->dynamic_libs, '/usr/local/opt/libffi/lib/libffi.6.dylib';
+while (my $lib = shift @target_libs) {
     say "otool -L $lib"; 
     my $libs = `otool -L $lib`;
     my @lib_arr = split "\n", $libs;
@@ -22,6 +23,8 @@ foreach my $lib (Alien::gdal->dynamic_libs, '/usr/local/opt/libffi/lib/libffi.6.
         say "adding $dylib for $lib";
         push @libs_to_pack, $dylib;
         $seen{$dylib}++;
+        #  be paranoid in case otool does not get the full set
+        push @target_libs, $dylib;
     }
 }
 
