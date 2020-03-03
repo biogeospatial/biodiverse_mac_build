@@ -29,9 +29,13 @@ jobs:
           
       - name: Probe /usr/lib etc
         run: |
+          echo /usr/local
           ls /usr/local
+          echo /usr/lib/
+          ls /usr/lib/
+          echo /usr/lib/system
           ls /usr/lib/system
-          ls /usr/lib/libsystem
+          
 
       - name: Install pkgconfig
         run: brew install pkgconfig
