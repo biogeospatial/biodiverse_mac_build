@@ -36,9 +36,10 @@ while (my $lib = shift @target_libs) {
         $line =~ /^\s+(.+?)\s/;
         my $dylib = $1;
         next if $seen{$dylib};
-        next if $dylib =~ m{^/System};
+        next if $dylib =~ m{^/System};  #  skip system libs
         #next if $dylib =~ m{^/usr/lib/system};
-        #next if $dylib =~ m{^/usr/lib/libsystem};
+        next if $dylib =~ m{^/usr/lib/libSystem};
+        next if $dylib =~ m{^/usr/lib/};
         next if $dylib =~ m{\Qdarwin-thread-multi-2level/auto/share/dist/Alien\E};  #  another alien
         say "adding $dylib for $lib";
         push @libs_to_pack, $dylib;
@@ -48,8 +49,11 @@ while (my $lib = shift @target_libs) {
     }
 }
 
+#my @inc_to_pack
+#  = map {('--link' => $_)}
+#    (@libs_to_pack, '/usr/local/opt/libffi/lib/libffi.6.dylib');
 my @inc_to_pack
-  = map {('--link' => $_)}
+  = map {("-a" => "$_\;../" . Path::Tiny::path($_)->basename)}
     (@libs_to_pack, '/usr/local/opt/libffi/lib/libffi.6.dylib');
 
 my @pp_cmd = (
