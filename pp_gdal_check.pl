@@ -19,6 +19,7 @@ while (my $lib = shift @target_libs) {
         my $dylib = $1;
         next if $seen{$dylib};
         next if $dylib =~ m{^/System};
+        next if $dylib =~ m{^/usr/lib/system};
         next if $dylib =~ m{darwin-thread-multi-2level/auto/share/dist/Alien};  #  another alien
         say "adding $dylib for $lib";
         push @libs_to_pack, $dylib;
@@ -28,8 +29,9 @@ while (my $lib = shift @target_libs) {
     }
 }
 
-my @inc_to_pack = map {('--link' => $_)} @libs_to_pack;
-push @inc_to_pack, ('--link' => '/usr/local/opt/libffi/lib/libffi.6.dylib');
+my @inc_to_pack
+  = map {('--link' => $_)}
+    (@libs_to_pack, '/usr/local/opt/libffi/lib/libffi.6.dylib');
 
 my @pp_cmd = (
     'pp',
