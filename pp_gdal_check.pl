@@ -18,6 +18,7 @@ foreach my $lib (Alien::gdal->dynamic_libs, '/usr/local/opt/libffi/lib/libffi.6.
         my $dylib = $1;
         next if $seen{$dylib};
         next if $dylib =~ m{^/System};
+        next if $dylib =~ m{darwin-thread-multi-2level/auto/share/dist/Alien};  #  another alien
         say "adding $dylib for $lib";
         push @libs_to_pack, $dylib;
         $seen{$dylib}++;
