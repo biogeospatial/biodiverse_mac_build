@@ -30,7 +30,7 @@ package FFICHECK {
     # from port/*.h
     eval{$ffi->attach(VSIMalloc => [qw/uint/] => 'opaque');};
     warn $@ if $@;
-    croak "Can't attach to GDAL methods. Does Alien::gdal provide GDAL dynamic libs?" unless FFICHECK->can('VSIMalloc');
+    warn "Can't attach to GDAL methods. Does Alien::gdal provide GDAL dynamic libs?" unless FFICHECK->can('VSIMalloc');
     
     1;
 
