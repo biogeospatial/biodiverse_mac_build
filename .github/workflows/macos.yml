@@ -140,6 +140,13 @@ jobs:
           cpanm --notest File::BaseDir
           cpanm --notest File::Find::Rule
       
+      - name: pack gdal script
+        run: |
+          echo "========"
+          perl pp_gdal_check.pl
+          ./pp_gdal_check
+          echo "========"
+      
       - name: Test pack
         run: |
           #ls -l /usr/local/lib/../Cellar/gdal/2.4.4/lib/libgdal.20.dylib
