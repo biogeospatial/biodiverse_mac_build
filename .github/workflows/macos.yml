@@ -92,7 +92,7 @@ jobs:
           #perlbrew install-patchperl
           #  we get 5.30 test failures due to https://github.com/Perl/perl5/pull/24
           #  but we can ignore them
-          [ -d ~/perl5/perlbrew/perls/5.30.1 ] || perlbrew install --notest --noman -j 2 perl-5.30.1
+          [ -d ~/perl5/perlbrew/perls/perl-5.30.1 ] || perlbrew install --notest --noman -j 2 perl-5.30.1
           perlbrew switch perl-5.30.1
           echo "##[add-path]/Users/runner/perl5/bin"
 
