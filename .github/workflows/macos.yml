@@ -45,8 +45,8 @@ jobs:
           which -a perlbrew
           perlbrew init
           perlbrew install-cpanm
-          perlbrew install-patchperl
-          perlbrew install --noman -j 2 perl-5.30.1
+          #perlbrew install-patchperl
+          perlbrew install --verbose --noman -j 2 perl-5.30.1
           #cat ~/perl5/perlbrew/build.perl-5.30.1.log
           perlbrew switch perl-5.30.1
           echo "##[add-path]/Users/runner/perl5/bin"
