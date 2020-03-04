@@ -45,8 +45,7 @@ jobs:
           which -a perlbrew
           perlbrew init
           perlbrew install-cpanm
-          #curl https://cpanmin.us | perl - App::cpanminus -n
-          perlbrew install perl-5.30.1
+          perlbrew install --noman -j2 perl-5.30.1
           perlbrew switch perl-5.30.1
           echo "##[add-path]/Users/runner/perl5/bin"
 
