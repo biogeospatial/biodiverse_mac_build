@@ -40,13 +40,16 @@ jobs:
         
       - name: Set up Perl
         run: |
+          echo Shell is $SHELL
           \curl -L https://install.perlbrew.pl | bash
           source ~/perl5/perlbrew/etc/bashrc
           which -a perlbrew
           perlbrew init
           perlbrew install-cpanm
           #perlbrew install-patchperl
-          perlbrew install --verbose --noman -j 2 perl-5.30.1
+          #  we get 5.30 test failures due to https://github.com/Perl/perl5/pull/24
+          #  but we can ignore them
+          perlbrew install --notest --noman -j 2 perl-5.30.1
           #cat ~/perl5/perlbrew/build.perl-5.30.1.log
           perlbrew switch perl-5.30.1
           echo "##[add-path]/Users/runner/perl5/bin"
