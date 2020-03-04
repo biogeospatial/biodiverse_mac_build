@@ -45,7 +45,8 @@ jobs:
           which -a perlbrew
           perlbrew init
           perlbrew install-cpanm
-          perlbrew install --noman -j2 perl-5.30.1
+          perlbrew install-patchperl
+          perlbrew install --noman -j 2 perl-5.30.1
           perlbrew switch perl-5.30.1
           echo "##[add-path]/Users/runner/perl5/bin"
 
@@ -123,7 +124,8 @@ jobs:
       - name: Prepare for cache
         run: |
           perl -V > perlversion.txt
-          #  change the checksum so we refresh the cache
+          echo "cache perlbrew 20200304" > perlversion.txt
+          #  change the checksum to refresh the cache
           echo 'with shared Alien installs' >> perlversion.txt
           ls -l perlversion.txt
 
