@@ -136,7 +136,7 @@ jobs:
         run: |
           source ~/perl5/perlbrew/etc/bashrc
           perl -V > perlversion.txt
-          echo "cache perlbrew 20200304" > perlversion.txt
+          echo "cache perlbrew 20200304b" > perlversion.txt
           #  change the checksum to refresh the cache
           echo 'with shared Alien installs' >> perlversion.txt
           ls -l perlversion.txt
