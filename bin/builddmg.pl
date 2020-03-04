@@ -10,7 +10,7 @@ use Cwd 'abs_path';
 use File::Basename;
 use File::Spec::Functions;
 use FindBin;
-use lib "$FindBin::Bin/../../../lib";
+#use lib "$FindBin::Bin/../../../lib";
 use Biodiverse::Config;
 
 local $| = 1;
@@ -27,18 +27,18 @@ my $help;
 #my $verbose;
 my $man = 0;
 my $output  = catfile($FindBin::Bin, "..", "builds", "Biodiverse-$bio_version-$mac_build_version.dmg");
-my $input  = catfile($FindBin::Bin, "..", "images", "Biodiverse.dmg");
-my $app = catfile($FindBin::Bin, "..", "builds", "Biodiverse.app");
+my $input   = catfile($FindBin::Bin, "..", "images", "Biodiverse.dmg");
+my $app     = catfile($FindBin::Bin, "..", "builds", "Biodiverse.app");
 my $mounted = "/Volumes/Biodiverse";
 
 GetOptions(
-    'help|?' => \$help,
-    'man'    => \$man,
-    'output|o=s' => \$output,
-    'input|i=s' => \$input,
-    'app|a=s' => \$app,
+    'help|?'      => \$help,
+    'man'         => \$man,
+    'output|o=s'  => \$output,
+    'input|i=s'   => \$input,
+    'app|a=s'     => \$app,
     'mounted|m=s' => \$mounted,
-    #'verbose|v' => \$verbose
+    #'verbose|v'   => \$verbose
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
@@ -74,7 +74,7 @@ sub copy_new_app() {
     # Copies the new Biodiverse.app to the mounted read/write dmg image.
     # Default is ../builds/Biodiverse.app.
     print "copy $app into $input\n";
-    print "$app size is " . (-s $app); 
+    print "$app size is " . (-s $app) . "\n"; 
     my @copy_app_args = ("cp", "-r", "$app" , "$mounted");
     system(@copy_app_args) == 0
         or die "system @copy_app_args failed: $?";
