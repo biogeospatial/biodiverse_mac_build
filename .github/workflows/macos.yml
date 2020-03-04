@@ -162,18 +162,7 @@ jobs:
           sudo mv /usr/local/optx /usr/local/opt
           sudo mv /usr/local/Cellarx /usr/local/Cellar
           
-          
-      #- name: Alien O'Toole
-      #  run: |
-      #    otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-gdal/lib/libgdal.dylib
-      #    otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-gdal/lib/libgdal.26.dylib
-      #    otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-geos-af/lib/libgeos.dylib
-      #    otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-geos-af/lib/libgeos_c.dylib
-      #    otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-sqlite/lib/libsqlite3.dylib
-      #    otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-sqlite/lib/libsqlite3.0.dylib
-      #    otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-proj/lib/libproj.dylib
-      #    otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-proj/lib/libproj.19.dylib
-        
+  
       - name: Upload checkpp artefact
         uses: actions/upload-artifact@v1
         with:
