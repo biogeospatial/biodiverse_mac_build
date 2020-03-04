@@ -29,9 +29,10 @@ my %seen;
 my @target_libs = (Alien::gdal->dynamic_libs, @bundle_list, '/usr/local/opt/libffi/lib/libffi.6.dylib');
 while (my $lib = shift @target_libs) {
     say "otool -L $lib"; 
-    my $libs = `otool -L $lib`;
-    my @lib_arr = split "\n", $libs;
-    shift @lib_arr;  #  first result is alien dylib
+    my @lib_arr = qx /otool -L $lib/;
+    warn qq["otool -L $lib" failed\n]
+      if not $? == 0;
+    shift @lib_arr;  #  first result is dylib we called otool on
     foreach my $line (@lib_arr) {
         $line =~ /^\s+(.+?)\s/;
         my $dylib = $1;
