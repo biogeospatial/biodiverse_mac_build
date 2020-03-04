@@ -46,6 +46,7 @@ jobs:
           which -a perlbrew
           perlbrew init
           perlbrew install-cpanm
+          which cpanm
           #perlbrew install-patchperl
           #  we get 5.30 test failures due to https://github.com/Perl/perl5/pull/24
           #  but we can ignore them
@@ -152,6 +153,7 @@ jobs:
 
       - name: Install cpan deps 
         run: |
+          source ~/perl5/perlbrew/etc/bashrc
           #  no share install for Alien::MSYS
           cpanm --notest Alien::MSYS
           #  ensure share install for gdal et al
@@ -170,6 +172,7 @@ jobs:
       
       - name: pack gdal script
         run: |
+          source ~/perl5/perlbrew/etc/bashrc
           echo "========"
           perl pp_gdal_check.pl
           echo "========"
@@ -194,6 +197,7 @@ jobs:
       
       - name: Test pack
         run: |
+          source ~/perl5/perlbrew/etc/bashrc
           #ls -l /usr/local/lib/../Cellar/gdal/2.4.4/lib/libgdal.20.dylib
           #ls -l /usr/local/opt/gdal/2.4.4/lib/libgdal.20.dylib
           echo Running perl dynamic_libs check
@@ -210,16 +214,16 @@ jobs:
           sudo mv /usr/local/Cellarx /usr/local/Cellar
           
           
-      - name: Alien O'Toole
-        run: |
-          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-gdal/lib/libgdal.dylib
-          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-gdal/lib/libgdal.26.dylib
-          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-geos-af/lib/libgeos.dylib
-          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-geos-af/lib/libgeos_c.dylib
-          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-sqlite/lib/libsqlite3.dylib
-          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-sqlite/lib/libsqlite3.0.dylib
-          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-proj/lib/libproj.dylib
-          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-proj/lib/libproj.19.dylib
+      #- name: Alien O'Toole
+      #  run: |
+      #    otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-gdal/lib/libgdal.dylib
+      #    otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-gdal/lib/libgdal.26.dylib
+      #    otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-geos-af/lib/libgeos.dylib
+      #    otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-geos-af/lib/libgeos_c.dylib
+      #    otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-sqlite/lib/libsqlite3.dylib
+      #    otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-sqlite/lib/libsqlite3.0.dylib
+      #    otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-proj/lib/libproj.dylib
+      #    otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-proj/lib/libproj.19.dylib
         
       - name: Upload checkpp artefact
         uses: actions/upload-artifact@v1
@@ -238,7 +242,9 @@ jobs:
         run: hdiutil resize -size 75MB ./images/Biodiverse.dmg
       
       - name: Run mmb3.pl
-        run: perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl
+        run: |
+          source ~/perl5/perlbrew/etc/bashrc
+          perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl
         
       - name: Find dmg file
         run: |
