@@ -55,9 +55,18 @@ while (my $lib = shift @target_libs) {
 my @inc_to_pack;
 foreach my $file (@libs_to_pack) {
     my $basename = Path::Tiny::path($file)->basename;
-    if (-l $file) {
-        say "$file is a symbolic link that points to " . readlink $file;
-        $file = _chase_lib_darwin($file);
+    while (-l $file) {
+        my $linked_file = readlink ($file);
+        say "$file is a symbolic link that points to $linked_file";
+        #$file = _chase_lib_darwin($file);
+        
+        #  handle relative paths, or symlinks to sibling files
+        if (!path($linked_file)->is_absolute) {
+            
+            my $file_path = path($file)->parent->stringify;
+            $linked_file = path("$file_path/$linked_file")->stringify;
+        }
+        $file = $linked_file;
     }
     push @inc_to_pack, ("-a" => "$file\;../" . $basename);
 }
@@ -153,7 +162,7 @@ sub _chase_lib_darwin {
    $file = path($file)->absolute;
 
    while (-l $file) {
-    say "Chasing link for $file";
+       say "Chasing link for $file";
        if ($file =~ /^(.*?\.\d+)(\.\d+)*\.dylib$/) {
            my $name = $1 . q/.dylib/;
            return $name if -e $name;
