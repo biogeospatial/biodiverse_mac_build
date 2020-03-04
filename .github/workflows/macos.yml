@@ -51,7 +51,6 @@ jobs:
           #  we get 5.30 test failures due to https://github.com/Perl/perl5/pull/24
           #  but we can ignore them
           perlbrew install --notest --noman -j 2 perl-5.30.1
-          #cat ~/perl5/perlbrew/build.perl-5.30.1.log
           perlbrew switch perl-5.30.1
           echo "##[add-path]/Users/runner/perl5/bin"
 
@@ -69,14 +68,7 @@ jobs:
 
       - name: Install GDAL and its deps
         run: brew install gdal
-        
-      #- name: Get lib names
-      #  run: |
-      #    find /usr/local/Cellar -name '*.dylib' -print
-      #    find /usr/local/Cellar -name 'libxml2*.dylib' -print
-      #    find /usr/local/Cellar -name '*lwgeom*.dylib' -print
-      #    find /usr/local/Cellar -name 'libsqlite3*.dylib' -print
-          
+
         
       - name: Install Gtk etc
         run: brew install gdk-pixbuf pango gtk+ gtk+3
@@ -87,50 +79,7 @@ jobs:
           sudo cp libgnomecanvas-2.0.dylib /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib/libgnomecanvas-2.0.dylib
           ls -lR /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib
         
-      #- name: otool probe
-      #  run: |
-      #    otool -L /usr/local/opt/gdal/lib/libgdal.20.dylib
-      #    otool -L /usr/local/opt/glib/lib/libgobject-2.0.0.dylib
-      #    otool -L /usr/local/opt/glib/lib/libglib-2.0.0.dylib
-      #    otool -L /usr/local/opt/libffi/lib/libffi.6.dylib
-      #    otool -L /usr/local/opt/pango/lib/libpango-1.0.0.dylib
-      #    otool -L /usr/local/opt/pango/lib/libpangocairo-1.0.0.dylib
-      #    otool -L /usr/local/opt/cairo/lib/libcairo.2.dylib
-      #    otool -L /usr/local/opt/freetype/lib/libfreetype.6.dylib
-      #    otool -L /usr/local/opt/glib/lib/libgthread-2.0.0.dylib
-      #    otool -L /usr/local/opt/pcre1/lib/libpcre.1.dylib
-      #    otool -L /usr/local/opt/gettext/lib/libintl.8.dylib
-      #    otool -L /usr/local/opt/pango/lib/libpangoft2-1.0.0.dylib
-      #    otool -L /usr/local/opt/harfbuzz/lib/libharfbuzz.0.dylib
-      #    otool -L /usr/local/opt/fontconfig/lib/libfontconfig.1.dylib
-      #    otool -L /usr/local/opt/pixman/lib/libpixman-1.0.dylib
-      #    otool -L /usr/local/opt/libpng/lib/libpng16.16.dylib
-      #    otool -L /usr/local/opt/gtk+/lib/libgtk-quartz-2.0.0.dylib
-      #    otool -L /usr/local/opt/gtk+/lib/libgdk-quartz-2.0.0.dylib
-      #    otool -L /usr/local/opt/atk/lib/libatk-1.0.0.dylib
-      #    otool -L /usr/local/opt/gdk-pixbuf/lib/libgdk_pixbuf-2.0.0.dylib
-      #    otool -L /usr/local/opt/glib/lib/libgio-2.0.0.dylib
-      #    otool -L /usr/local/opt/glib/lib/libgmodule-2.0.0.dylib
-      #    otool -L /usr/local/opt/openssl/lib/libssl.1.0.0.dylib
-      #    otool -L /usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib
-      #    otool -L /usr/local/opt/proj/lib/libproj.15.dylib
-      #    otool -L /usr/local/opt/json-c/lib/libjson-c.4.dylib
-      #    otool -L /usr/local/opt/freexl/lib/libfreexl.1.dylib
-      #    otool -L /usr/local/opt/geos/lib/libgeos_c.1.dylib
-      #    otool -L /usr/local/opt/giflib/lib/libgif.7.dylib
-      #    otool -L /usr/local/opt/libjpeg/lib/libjpeg.9.dylib
-      #    otool -L /usr/local/opt/libgeotiff/lib/libgeotiff.5.dylib
-      #    otool -L /usr/local/opt/libtiff/lib/libtiff.5.dylib
-      #    otool -L /usr/local/opt/libspatialite/lib/libspatialite.7.dylib
-      #    otool -L /usr/local/opt/geos/lib/libgeos-3.8.0.dylib
-      #    otool -L libgnomecanvas-2.0.dylib
-      #    otool -L /usr/local/opt/libart/lib/libart_lgpl_2.2.dylib
-      #    otool -L /usr/local/opt/gtk+/lib/libgailutil.18.dylib
-      #    otool -L /usr/local/opt/fribidi/lib/libfribidi.0.dylib
-      #    otool -L /usr/local/opt/pzstd/lib/libzstd.1.dylib
-      #    otool -L /usr/local/Cellar/libxml2/2.9.10/lib/libxml2.2.dylib
-      #    otool -L /usr/local/Cellar/sqlite/3.31.1/lib/libsqlite3.0.dylib
-      #    otool -L /usr/local/opt/graphite2/lib/libgraphite2.3.dylib
+      
 
       - name: Prepare for cache
         run: |
