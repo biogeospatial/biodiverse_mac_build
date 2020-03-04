@@ -37,7 +37,7 @@ while (my $lib = shift @target_libs) {
         $line =~ /^\s+(.+?)\s/;
         my $dylib = $1;
         next if $seen{$dylib};
-        next if $dylib =~ m{^/System};  #  skip system libs
+        next if $dylib =~ m{^/System/Library};  #  skip system libs
         #next if $dylib =~ m{^/usr/lib/system};
         next if $dylib =~ m{^/usr/lib/libSystem};
         next if $dylib =~ m{^/usr/lib/};
