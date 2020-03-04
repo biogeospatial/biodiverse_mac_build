@@ -37,31 +37,11 @@ jobs:
           ls /usr/lib/system
           
 
-        
-      - name: Set up Perl
-        run: |
-          echo Shell is $SHELL
-          \curl -L https://install.perlbrew.pl | bash
-          source ~/perl5/perlbrew/etc/bashrc
-          which -a perlbrew
-          perlbrew init
-          perlbrew install-cpanm
-          which cpanm
-          #perlbrew install-patchperl
-          #  we get 5.30 test failures due to https://github.com/Perl/perl5/pull/24
-          #  but we can ignore them
-          perlbrew install --notest --noman -j 2 perl-5.30.1
-          perlbrew switch perl-5.30.1
-          echo "##[add-path]/Users/runner/perl5/bin"
-
       - uses: actions/upload-artifact@v1
         if: failure()
         with:
           name: perlbrew_log
           path: /Users/runner/perl5/perlbrew/build.perl-5.30.1.log
-          
-      - name: perl -V
-        run: perl -V
 
       - name: Install pkgconfig
         run: brew install pkgconfig
@@ -81,7 +61,7 @@ jobs:
         
       
 
-      - name: Prepare for cache
+      - name: Prepare for perl cache
         run: |
           source ~/perl5/perlbrew/etc/bashrc
           perl -V > perlversion.txt
@@ -93,7 +73,7 @@ jobs:
       #- name: clear cache
       #  run: rm ~/perl5/${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
 
-      - name: Cache CPAN modules
+      - name: Perl5 cache
         uses: actions/cache@v1
         with:
           path: ~/perl5
@@ -101,9 +81,28 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
 
+        
+      - name: Set up Perl
+        run: |
+          echo Shell is $SHELL
+          \curl -L https://install.perlbrew.pl | bash
+          source ~/perl5/perlbrew/etc/bashrc
+          which -a perlbrew
+          perlbrew init
+          perlbrew install-cpanm
+          which cpanm
+          #perlbrew install-patchperl
+          #  we get 5.30 test failures due to https://github.com/Perl/perl5/pull/24
+          #  but we can ignore them
+          perlbrew install --notest --noman -j 2 perl-5.30.1
+          perlbrew switch perl-5.30.1
+          echo "##[add-path]/Users/runner/perl5/bin"
+
+
       - name: Install cpan deps 
         run: |
           source ~/perl5/perlbrew/etc/bashrc
+          perl -v
           #  no share install for Alien::MSYS
           cpanm --notest Alien::MSYS
           #  ensure share install for gdal et al
@@ -123,6 +122,7 @@ jobs:
       - name: pack gdal script
         run: |
           source ~/perl5/perlbrew/etc/bashrc
+          perl -v
           echo "========"
           perl pp_gdal_check.pl
           echo "========"
@@ -148,8 +148,7 @@ jobs:
       - name: Test pack
         run: |
           source ~/perl5/perlbrew/etc/bashrc
-          #ls -l /usr/local/lib/../Cellar/gdal/2.4.4/lib/libgdal.20.dylib
-          #ls -l /usr/local/opt/gdal/2.4.4/lib/libgdal.20.dylib
+          perl -v
           echo Running perl dynamic_libs check
           perl -e 'use 5.020; use Geo::GDAL::FFI; say join ":", Alien::gdal->dynamic_libs'
           pp -M Alien::gdal -M Alien::proj -M Alien::geos::af -M Alien::sqlite -M FFI::CheckLib -e 'use 5.020; use Alien::gdal; say join ":", Alien::gdal->dynamic_libs' -o checkpp
