@@ -40,8 +40,9 @@ jobs:
         
       - name: Set up Perl
         run: |
-          #\curl -L https://install.perlbrew.pl | bash
+          \curl -L https://install.perlbrew.pl | bash
           source ~/perl5/perlbrew/etc/bashrc
+          which -a perlbrew
           perlbrew init
           perlbrew install-cpanm
           #curl https://cpanmin.us | perl - App::cpanminus -n
