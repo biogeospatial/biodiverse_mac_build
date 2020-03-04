@@ -174,7 +174,9 @@ jobs:
         run: git clone https://github.com/shawnlaffan/biodiverse.git
         
       #- name: Check Biodiverse can run
-      #  run: prove -l biodiverse/t
+      #  run: |
+      #    source ~/perl5/perlbrew/etc/bashrc
+      #    prove -l biodiverse/t
       
       - name: Resize dmg file
         run: hdiutil resize -size 75MB ./images/Biodiverse.dmg
