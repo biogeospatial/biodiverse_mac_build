@@ -13,7 +13,7 @@ use Module::ScanDeps;
 
 use Alien::gdal;
 
-my $target_script = 'test_script.pl';
+my $target_script = $ARGV[0] || 'test_script.pl';
 
 
 say '+++++';
