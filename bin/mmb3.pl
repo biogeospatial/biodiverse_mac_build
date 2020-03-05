@@ -140,6 +140,36 @@ my @dylibs = qw {
 #  moved out:
 #  /usr/local/Cellar/sqlite/3.31.1/lib/libsqlite3.0.dylib
 
+#  temporary for desktop with older brewed libs
+#  #  disable for now
+my @xxdylibs = (
+    'libgdal.20.dylib',          'libgobject-2.0.0.dylib', 
+    'libglib-2.0.0.dylib',       'libffi.6.dylib', 
+    'libpango-1.0.0.dylib',      'libpangocairo-1.0.0.dylib', 
+    'libcairo.2.dylib',          'libfreetype.6.dylib', 
+    'libgthread-2.0.0.dylib',    'libpcre.1.dylib', 
+    'libintl.8.dylib',           'libpangoft2-1.0.0.dylib', 
+    'libharfbuzz.0.dylib',       'libfontconfig.1.dylib', 
+    'libpixman-1.0.dylib',       'libpng16.16.dylib', 
+    'libgtk-quartz-2.0.0.dylib', 'libgdk-quartz-2.0.0.dylib', 
+    'libatk-1.0.0.dylib',        'libgdk_pixbuf-2.0.0.dylib', 
+    'libgio-2.0.0.dylib',        'libgmodule-2.0.0.dylib', 
+    'libssl.1.0.0.dylib',        'libcrypto.1.0.0.dylib', 
+    'libgdal.20.dylib',          'libproj.13.dylib', 
+    'libjson-c.4.dylib',         'libfreexl.1.dylib', 
+    'libgeos_c.1.dylib',         'libgif.7.dylib', 
+    'libjpeg.9.dylib',           'libgeotiff.2.dylib', 
+    'libtiff.5.dylib',           'libspatialite.7.dylib', 
+    'libgeos-3.7.0.dylib',       'liblwgeom.dylib', 
+    'libgnomecanvas-2.0.dylib',  'libart_lgpl_2.2.dylib', 
+    'libgailutil.18.dylib',      'libfribidi.0.dylib',
+    'libzstd.1.dylib',
+    '/usr/local/Cellar/libxml2/2.9.6/lib/libxml2.2.dylib', 
+    '/usr/local/Cellar/sqlite/3.21.0/lib/libsqlite3.0.dylib', 
+    'libgraphite2.3.dylib',
+);
+
+
 
 # Find the absolute paths to each supplied
 # dynamic library. Each library is supplied
@@ -368,8 +398,10 @@ sub build_dmg(){
     print "[build_dmg] Building dmg image...\n" if ($verbose);
     my $builddmg = Path::Class::dir ($root_dir,'bin', 'builddmg.pl' );
     print "[build_dmg] build_dmg: $builddmg\n" if ($verbose);
-    local $ENV{PERL5LIB} = "$script_root_dir/lib:$ENV{PERL5LIB}";
-    system ('perl', $builddmg);
+    say "script root dir is $script_root_dir";
+    say "PERL5LIB env var is " . ($ENV{PERL5LIB} // '');
+    local $ENV{PERL5LIB} = "$script_root_dir/lib:" . ($ENV{PERL5LIB} // "");
+    system ($^X, $builddmg);
 }
 
 build_dmg();
