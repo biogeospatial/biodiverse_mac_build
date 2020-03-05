@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+###!/usr/bin/perl
 
 use strict;
 use warnings;
@@ -10,7 +10,7 @@ use Cwd 'abs_path';
 use File::Basename;
 use File::Spec::Functions;
 use FindBin;
-use lib "$FindBin::Bin/../../../lib";
+#use lib "$FindBin::Bin/../../../lib";
 use Biodiverse::Config;
 
 local $| = 1;
@@ -97,7 +97,9 @@ sub create_new_dmg() {
         or die "system @convert_args failed: $?";
 }
 
+say 'mount_read_write';
 mount_read_write_dmg();
+say 'removing app';
 remove_app();
 remove_old_read_only_dmg();
 copy_new_app();
