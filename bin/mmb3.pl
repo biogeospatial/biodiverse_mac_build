@@ -4,6 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 use English qw { -no_match_vars };
+use Carp;
 
 local $| = 1;
 
@@ -15,6 +16,8 @@ use Cwd 'abs_path';
 use File::Basename;
 use File::Find;
 use File::BaseDir qw/xdg_data_dirs/;
+use Path::Tiny qw/ path /;
+use Module::ScanDeps;
 
 
 use Getopt::Long::Descriptive;
@@ -80,6 +83,7 @@ if (!-d $out_folder) {
 $ENV{BDV_PP_BUILDING}              = 1;
 $ENV{BIODIVERSE_EXTENSIONS_IGNORE} = 1;
 
+
 use File::Find::Rule ();
 our %dylib_files_hash;
 BEGIN {
@@ -92,15 +96,15 @@ BEGIN {
     #say '=====';
     #say join "\n", @dylib_files_list;
     #say '=====';
-    
+
     %dylib_files_hash = map {basename ($_) => $_} @dylib_files_list;
 }
 
 my @links;
 
 # All the dynamic libraries to pack.
-# Could change this to only include 
-# the minimum set and then use 
+# Could change this to only include
+# the minimum set and then use
 # otools -L to find all dependencies.
 my @dylibs = qw {
     libgdal.20.dylib          libgobject-2.0.0.dylib
@@ -131,7 +135,7 @@ my @dylibs = qw {
     libnetcdf.15.dylib        libhdf5.103.dylib
     libcfitsio.8.dylib
     libdap.25.dylib           libdapserver.7.dylib
-    libdapclient.6.dylib      libcurl.4.dylib 
+    libdapclient.6.dylib      libcurl.4.dylib
     libopenjp2.7.dylib        libcfitsio.8.dylib
     /usr/local/Cellar/libxml2/2.9.10/lib/libxml2.2.dylib
     libsqlite3.0.dylib
@@ -142,30 +146,30 @@ my @dylibs = qw {
 
 #  temporary for desktop with older brewed libs
 #  #  disable for now
-my @xxdylibs = (
-    'libgdal.20.dylib',          'libgobject-2.0.0.dylib', 
-    'libglib-2.0.0.dylib',       'libffi.6.dylib', 
-    'libpango-1.0.0.dylib',      'libpangocairo-1.0.0.dylib', 
-    'libcairo.2.dylib',          'libfreetype.6.dylib', 
-    'libgthread-2.0.0.dylib',    'libpcre.1.dylib', 
-    'libintl.8.dylib',           'libpangoft2-1.0.0.dylib', 
-    'libharfbuzz.0.dylib',       'libfontconfig.1.dylib', 
-    'libpixman-1.0.dylib',       'libpng16.16.dylib', 
-    'libgtk-quartz-2.0.0.dylib', 'libgdk-quartz-2.0.0.dylib', 
-    'libatk-1.0.0.dylib',        'libgdk_pixbuf-2.0.0.dylib', 
-    'libgio-2.0.0.dylib',        'libgmodule-2.0.0.dylib', 
-    'libssl.1.0.0.dylib',        'libcrypto.1.0.0.dylib', 
-    'libgdal.20.dylib',          'libproj.13.dylib', 
-    'libjson-c.4.dylib',         'libfreexl.1.dylib', 
-    'libgeos_c.1.dylib',         'libgif.7.dylib', 
-    'libjpeg.9.dylib',           'libgeotiff.2.dylib', 
-    'libtiff.5.dylib',           'libspatialite.7.dylib', 
-    'libgeos-3.7.0.dylib',       'liblwgeom.dylib', 
-    'libgnomecanvas-2.0.dylib',  'libart_lgpl_2.2.dylib', 
+@dylibs = (
+    'libgdal.20.dylib',          'libgobject-2.0.0.dylib',
+    'libglib-2.0.0.dylib',       'libffi.6.dylib',
+    'libpango-1.0.0.dylib',      'libpangocairo-1.0.0.dylib',
+    'libcairo.2.dylib',          'libfreetype.6.dylib',
+    'libgthread-2.0.0.dylib',    'libpcre.1.dylib',
+    'libintl.8.dylib',           'libpangoft2-1.0.0.dylib',
+    'libharfbuzz.0.dylib',       'libfontconfig.1.dylib',
+    'libpixman-1.0.dylib',       'libpng16.16.dylib',
+    'libgtk-quartz-2.0.0.dylib', 'libgdk-quartz-2.0.0.dylib',
+    'libatk-1.0.0.dylib',        'libgdk_pixbuf-2.0.0.dylib',
+    'libgio-2.0.0.dylib',        'libgmodule-2.0.0.dylib',
+    'libssl.1.0.0.dylib',        'libcrypto.1.0.0.dylib',
+    'libgdal.20.dylib',          'libproj.13.dylib',
+    'libjson-c.4.dylib',         'libfreexl.1.dylib',
+    'libgeos_c.1.dylib',         'libgif.7.dylib',
+    'libjpeg.9.dylib',           'libgeotiff.2.dylib',
+    'libtiff.5.dylib',           'libspatialite.7.dylib',
+    'libgeos-3.7.0.dylib',       'liblwgeom.dylib',
+    'libgnomecanvas-2.0.dylib',  'libart_lgpl_2.2.dylib',
     'libgailutil.18.dylib',      'libfribidi.0.dylib',
     'libzstd.1.dylib',
-    '/usr/local/Cellar/libxml2/2.9.6/lib/libxml2.2.dylib', 
-    '/usr/local/Cellar/sqlite/3.21.0/lib/libsqlite3.0.dylib', 
+    '/usr/local/Cellar/libxml2/2.9.6/lib/libxml2.2.dylib',
+    '/usr/local/Cellar/sqlite/3.21.0/lib/libsqlite3.0.dylib',
     'libgraphite2.3.dylib',
 );
 
@@ -174,8 +178,8 @@ my @xxdylibs = (
 # Find the absolute paths to each supplied
 # dynamic library. Each library is supplied
 # to pp with a -a and uses an alias. The alias
-# packs the library at the top level of the 
-# Par:Packer archive. This is where the 
+# packs the library at the top level of the
+# Par:Packer archive. This is where the
 # Biodiverse binary will be able to find it.
 print "finding dynamic library paths\n";
 my %checked_dylib;
@@ -200,7 +204,7 @@ create_lib_paths();
 # library.
 sub get_name_from_dynamic_lib {
     my $lib = shift;
-    
+
     my $name;
 
     chomp(my @ot = qx( otool -D $lib ));
@@ -213,7 +217,7 @@ sub get_name_from_dynamic_lib {
 
 
 # Search for a dynamic library
-# in the paths supplied. 
+# in the paths supplied.
 sub find_dylib_in_path {
     my ($file, @path) = @_;
 
@@ -225,7 +229,7 @@ sub find_dylib_in_path {
     return $file if -f $file;
 
     return $dylib_files_hash{$file} if $dylib_files_hash{$file};
-    
+
     #  fallback search
     say "Searching for file $file";
 
@@ -268,13 +272,138 @@ sub create_lib_paths {
 
     chop $dyld_library_path;
     chop $ld_library_path;
-    print "[create_lib_paths] \$dyld_library_path: $dyld_library_path\n" 
+    print "[create_lib_paths] \$dyld_library_path: $dyld_library_path\n"
       if $verbose;
-    print "[create_lib_paths] \$ld_library_path: $ld_library_path\n" 
+    print "[create_lib_paths] \$ld_library_path: $ld_library_path\n"
       if $verbose;
 }
 
 
+#  find dependent dlls
+#  could also adapt some of Module::ScanDeps::_compile_or_execute
+#  as it handles more edge cases
+sub get_dep_dlls {
+    my ($script, $no_execute_flag) = @_;
+
+    #  This is clunky:
+    #  make sure $script/../lib is in @INC
+    #  assume script is in a bin folder
+    my $rlib_path = (path ($script)->parent->stringify) . '/lib';
+    #say "======= $rlib_path/lib ======";
+    local @INC = (@INC, $rlib_path)
+      if -d $rlib_path;
+
+    my $deps_hash = scan_deps(
+        files   => [ $script ],
+        recurse => 1,
+        execute => !$no_execute_flag,
+        #cache_file => $cache_file,
+    );
+
+    my @lib_paths
+      = reverse sort {length $a <=> length $b}
+        map {path($_)->absolute}
+        @INC;
+
+    my $paths = join '|', map {quotemeta} @lib_paths;
+    my $inc_path_re = qr /^($paths)/i;
+    #say $inc_path_re;
+
+    my $RE_DLL_EXT = qr/\.$Config::Config{so}/i;
+    $RE_DLL_EXT = qr/\.bundle$/;
+
+    my %dll_hash;
+    foreach my $package (keys %$deps_hash) {
+        #  could access {uses} directly, but this helps with debug
+        my $details = $deps_hash->{$package};
+        my $uses    = $details->{uses};
+        next if !$uses;
+
+        foreach my $dll (grep {$_ =~ $RE_DLL_EXT} @$uses) {
+            my $dll_path = $deps_hash->{$package}{file};
+            #  Remove trailing component of path after /lib/
+            if ($dll_path =~ m/$inc_path_re/) {
+                $dll_path = $1 . '/' . $dll;
+            }
+            else {
+                #  fallback, get everything after /lib/
+                $dll_path =~ s|(?<=/lib/).+?$||;
+                $dll_path .= $dll;
+            }
+            #say $dll_path;
+            croak "either cannot find or cannot read $dll_path "
+                . "for package $package"
+              if not -r $dll_path;
+            $dll_hash{$dll_path}++;
+        }
+    }
+
+    my @dll_list = sort keys %dll_hash;
+    return wantarray ? @dll_list : \@dll_list;
+}
+
+sub get_inc_to_pack {
+    my $target_script = shift;
+
+    say '+++++';
+    say 'Finding XS bundle files';
+    my @bundle_list = get_dep_dlls($target_script);
+    #say join ' ', @bundle_list;
+    #system ('otool', '-L', $bundle_list[0]);
+    say '+++++';
+
+    my @libs_to_pack;
+    my %seen;
+
+    my @target_libs = (Alien::gdal->dynamic_libs, @bundle_list, '/usr/local/opt/libffi/lib/libffi.6.dylib');
+    while (my $lib = shift @target_libs) {
+        say "otool -L $lib";
+        my @lib_arr = qx /otool -L $lib/;
+        warn qq["otool -L $lib" failed\n]
+          if not $? == 0;
+        shift @lib_arr;  #  first result is dylib we called otool on
+        foreach my $line (@lib_arr) {
+            $line =~ /^\s+(.+?)\s/;
+            my $dylib = $1;
+            next if $seen{$dylib};
+            next if $dylib =~ m{^/System};  #  skip system libs
+            #next if $dylib =~ m{^/usr/lib/system};
+            next if $dylib =~ m{^/usr/lib/libSystem};
+            next if $dylib =~ m{^/usr/lib/};
+            next if $dylib =~ m{\Qdarwin-thread-multi-2level/auto/share/dist/Alien\E};  #  another alien
+            say "adding $dylib for $lib";
+            push @libs_to_pack, $dylib;
+            $seen{$dylib}++;
+            #  be paranoid in case otool does not get the full set
+            push @target_libs, $dylib;
+        }
+    }
+
+    #my @inc_to_pack
+    #  = map {('--link' => $_)}
+    #    (@libs_to_pack, '/usr/local/opt/libffi/lib/libffi.6.dylib');
+    my @inc_to_pack;
+    foreach my $file (@libs_to_pack) {
+        my $basename = Path::Tiny::path($file)->basename;
+        while (-l $file) {
+            my $linked_file = readlink ($file);
+            say "$file is a symbolic link that points to $linked_file";
+            #$file = _chase_lib_darwin($file);
+
+            #  handle relative paths, or symlinks to sibling files
+            if (!path($linked_file)->is_absolute) {
+
+                my $file_path = path($file)->parent->stringify;
+                $linked_file = path("$file_path/$linked_file")->stringify;
+            }
+            $file = $linked_file;
+        }
+        push @inc_to_pack, ("-a" => "$file\;../" . $basename);
+    }
+
+    return @inc_to_pack;
+
+}
 #my @gdal_deps = qw /jpeg gif geotiff proc
 #                  json-c pcre freexl spatialite
 #/;
@@ -305,17 +434,17 @@ get_xdg_data_dirs();
 
 for my $dir (@mime_dirs) {
     my $mime_dir_abs  = Path::Class::file ($dir)->basename;
-    push @add_files, ('-a', "$dir\;$mime_dir_abs");  
+    push @add_files, ('-a', "$dir\;$mime_dir_abs");
 }
 
 # Add the pixbuf loaders directory
 my $pixbuf_loaders_abs  = Path::Class::dir (@pixbuf_loaders)->basename;
-push @add_files, ('-a', "@pixbuf_loaders\\;$pixbuf_loaders_abs/");  
+push @add_files, ('-a', "@pixbuf_loaders\\;$pixbuf_loaders_abs/");
 
 # Add the pixbuf query loader
 #$pixbuf_loader = Path::Class::file ('usr','local','bin','gdk-pixbuf-query-loaders')
 my $pixbuf_loader_abs  = Path::Class::file (@pixbuf_query_loader)->basename;
-push @add_files, ('-a', "@pixbuf_query_loader\;$pixbuf_loader_abs");  
+push @add_files, ('-a', "@pixbuf_query_loader\;$pixbuf_loader_abs");
 
 # Add the hicolor directory
 #my $hicolor_dir = Path::Class::dir ('usr','local','share','icons','hicolor')
@@ -337,7 +466,7 @@ my @icon_file_arg  = $icon_file ? ('-a', "$icon_file\;$icon_file_base") : ();
 
 ###########################################
 #
-# Run the constructed pp command. 
+# Run the constructed pp command.
 #
 ###########################################
 
@@ -361,6 +490,8 @@ foreach my $alien (@aliens) {
     }
 }
 
+my @inc_to_pack = get_inc_to_pack ($script_fullname);
+
 my @cmd = (
     'pp',
     #$verbose,
@@ -371,7 +502,8 @@ my @cmd = (
     @ui_arg,
     @icon_file_arg,
     $execute,
-    @links,
+    #@links,
+    @inc_to_pack,
     @add_files,
     @rest_of_pp_args,
     '-o',
@@ -391,7 +523,7 @@ system @cmd;
 
 ###########################################
 #
-# Build the dmg image. 
+# Build the dmg image.
 #
 ###########################################
 sub build_dmg(){
