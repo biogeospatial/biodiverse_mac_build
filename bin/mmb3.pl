@@ -522,8 +522,11 @@ system @cmd;
 
 
 sub icon_into_app_file {
+    #  also see 
+    #  https://stackoverflow.com/questions/8371790/how-to-set-icon-on-file-or-directory-using-cli-on-os-x
+    #  https://apple.stackexchange.com/questions/6901/how-can-i-change-a-file-or-folder-icon-using-the-terminal
     my $target = "$root_dir/builds/Biodiverse.app/Icon\r";
-    return if -e $target;
+    #    return if -e $target;
     File::Copy::copy "$root_dir/images/icon.icns", $target
       or warn "Unable to copy icon file, $@";
 }
