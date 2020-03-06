@@ -521,6 +521,17 @@ say join ' ', "\nCOMMAND TO RUN:\n", @cmd;
 system @cmd;
 
 
+sub icon_into_app_file {
+    my $target = "$root_dir/builds/Biodiverse.app/Icon\r";
+    return if -e $target;
+    File::Copy::copy "$root_dir/images/icon.icns", $target
+      or warn "Unable to copy icon file, $@";
+}
+
+
+icon_into_app_file ();
+
+
 ###########################################
 #
 # Build the dmg image.
