@@ -86,92 +86,92 @@ $ENV{BIODIVERSE_EXTENSIONS_IGNORE} = 1;
 
 use File::Find::Rule ();
 our %dylib_files_hash;
-BEGIN {
-    my @dylib_files_list
-      = File::Find::Rule->extras({ follow => 1, follow_skip=>2 })
-                        ->file()
-                        ->name( qr/\d\.dylib$/ )
-                        ->in( '/usr/local/opt' )
-                        ;
-    #say '=====';
-    #say join "\n", @dylib_files_list;
-    #say '=====';
-
-    %dylib_files_hash = map {basename ($_) => $_} @dylib_files_list;
-}
+# BEGIN {
+#     my @dylib_files_list
+#       = File::Find::Rule->extras({ follow => 1, follow_skip=>2 })
+#                         ->file()
+#                         ->name( qr/\d\.dylib$/ )
+#                         ->in( '/usr/local/opt' )
+#                         ;
+#     #say '=====';
+#     #say join "\n", @dylib_files_list;
+#     #say '=====';
+#
+#     %dylib_files_hash = map {basename ($_) => $_} @dylib_files_list;
+# }
 
 my @links;
-
+my @dylibs;
 # All the dynamic libraries to pack.
 # Could change this to only include
 # the minimum set and then use
 # otools -L to find all dependencies.
-my @dylibs = qw {
-    libgdal.20.dylib          libgobject-2.0.0.dylib
-    libglib-2.0.0.dylib       libffi.6.dylib
-    libpango-1.0.0.dylib      libpangocairo-1.0.0.dylib
-    libcairo.2.dylib          libfreetype.6.dylib
-    libgthread-2.0.0.dylib    libpcre.1.dylib
-    libintl.8.dylib           libpangoft2-1.0.0.dylib
-    libharfbuzz.0.dylib       libfontconfig.1.dylib
-    libpixman-1.0.dylib       libpng16.16.dylib
-    libgtk-quartz-2.0.0.dylib libgdk-quartz-2.0.0.dylib
-    libatk-1.0.0.dylib        libgdk_pixbuf-2.0.0.dylib
-    libgio-2.0.0.dylib        libgmodule-2.0.0.dylib
-    libssl.1.0.0.dylib        libwebp.7.dylib
-    libcrypto.1.0.0.dylib     libcrypto.1.1.dylib
-    libproj.15.dylib          libpq.5.dylib
-    libjson-c.4.dylib         libfreexl.1.dylib
-    libgeos_c.1.dylib         libgif.7.dylib
-    libjpeg.9.dylib           libgeotiff.5.dylib
-    libtiff.5.dylib           libspatialite.7.dylib
-    libgeos-3.8.0.dylib       liblzma.5.dylib
-    libgnomecanvas-2.0.dylib  libart_lgpl_2.2.dylib
-    libgailutil.18.dylib      libfribidi.0.dylib
-    libzstd.1.dylib           libxerces-c-3.2.dylib
-    libepsilon.1.dylib        libjasper.4.dylib
-    libodbc.2.dylib           libodbcinst.2.dylib
-    libexpat.1.dylib          libxerces-c-3.2.dylib
-    libnetcdf.15.dylib        libhdf5.103.dylib
-    libcfitsio.8.dylib
-    libdap.25.dylib           libdapserver.7.dylib
-    libdapclient.6.dylib      libcurl.4.dylib
-    libopenjp2.7.dylib        libcfitsio.8.dylib
-    /usr/local/Cellar/libxml2/2.9.10/lib/libxml2.2.dylib
-    libsqlite3.0.dylib
-    libgraphite2.3.dylib
-};
+# my @dylibs = qw {
+#     libgdal.20.dylib          libgobject-2.0.0.dylib
+#     libglib-2.0.0.dylib       libffi.6.dylib
+#     libpango-1.0.0.dylib      libpangocairo-1.0.0.dylib
+#     libcairo.2.dylib          libfreetype.6.dylib
+#     libgthread-2.0.0.dylib    libpcre.1.dylib
+#     libintl.8.dylib           libpangoft2-1.0.0.dylib
+#     libharfbuzz.0.dylib       libfontconfig.1.dylib
+#     libpixman-1.0.dylib       libpng16.16.dylib
+#     libgtk-quartz-2.0.0.dylib libgdk-quartz-2.0.0.dylib
+#     libatk-1.0.0.dylib        libgdk_pixbuf-2.0.0.dylib
+#     libgio-2.0.0.dylib        libgmodule-2.0.0.dylib
+#     libssl.1.0.0.dylib        libwebp.7.dylib
+#     libcrypto.1.0.0.dylib     libcrypto.1.1.dylib
+#     libproj.15.dylib          libpq.5.dylib
+#     libjson-c.4.dylib         libfreexl.1.dylib
+#     libgeos_c.1.dylib         libgif.7.dylib
+#     libjpeg.9.dylib           libgeotiff.5.dylib
+#     libtiff.5.dylib           libspatialite.7.dylib
+#     libgeos-3.8.0.dylib       liblzma.5.dylib
+#     libgnomecanvas-2.0.dylib  libart_lgpl_2.2.dylib
+#     libgailutil.18.dylib      libfribidi.0.dylib
+#     libzstd.1.dylib           libxerces-c-3.2.dylib
+#     libepsilon.1.dylib        libjasper.4.dylib
+#     libodbc.2.dylib           libodbcinst.2.dylib
+#     libexpat.1.dylib          libxerces-c-3.2.dylib
+#     libnetcdf.15.dylib        libhdf5.103.dylib
+#     libcfitsio.8.dylib
+#     libdap.25.dylib           libdapserver.7.dylib
+#     libdapclient.6.dylib      libcurl.4.dylib
+#     libopenjp2.7.dylib        libcfitsio.8.dylib
+#     /usr/local/Cellar/libxml2/2.9.10/lib/libxml2.2.dylib
+#     libsqlite3.0.dylib
+#     libgraphite2.3.dylib
+# };
 #  moved out:
 #  /usr/local/Cellar/sqlite/3.31.1/lib/libsqlite3.0.dylib
 
 #  temporary for desktop with older brewed libs
 #  #  disable for now
-@dylibs = (
-    'libgdal.20.dylib',          'libgobject-2.0.0.dylib',
-    'libglib-2.0.0.dylib',       'libffi.6.dylib',
-    'libpango-1.0.0.dylib',      'libpangocairo-1.0.0.dylib',
-    'libcairo.2.dylib',          'libfreetype.6.dylib',
-    'libgthread-2.0.0.dylib',    'libpcre.1.dylib',
-    'libintl.8.dylib',           'libpangoft2-1.0.0.dylib',
-    'libharfbuzz.0.dylib',       'libfontconfig.1.dylib',
-    'libpixman-1.0.dylib',       'libpng16.16.dylib',
-    'libgtk-quartz-2.0.0.dylib', 'libgdk-quartz-2.0.0.dylib',
-    'libatk-1.0.0.dylib',        'libgdk_pixbuf-2.0.0.dylib',
-    'libgio-2.0.0.dylib',        'libgmodule-2.0.0.dylib',
-    'libssl.1.0.0.dylib',        'libcrypto.1.0.0.dylib',
-    'libgdal.20.dylib',          'libproj.13.dylib',
-    'libjson-c.4.dylib',         'libfreexl.1.dylib',
-    'libgeos_c.1.dylib',         'libgif.7.dylib',
-    'libjpeg.9.dylib',           'libgeotiff.2.dylib',
-    'libtiff.5.dylib',           'libspatialite.7.dylib',
-    'libgeos-3.7.0.dylib',       'liblwgeom.dylib',
-    'libgnomecanvas-2.0.dylib',  'libart_lgpl_2.2.dylib',
-    'libgailutil.18.dylib',      'libfribidi.0.dylib',
-    'libzstd.1.dylib',
-    '/usr/local/Cellar/libxml2/2.9.6/lib/libxml2.2.dylib',
-    '/usr/local/Cellar/sqlite/3.21.0/lib/libsqlite3.0.dylib',
-    'libgraphite2.3.dylib',
-);
+# @dylibs = (
+#     'libgdal.20.dylib',          'libgobject-2.0.0.dylib',
+#     'libglib-2.0.0.dylib',       'libffi.6.dylib',
+#     'libpango-1.0.0.dylib',      'libpangocairo-1.0.0.dylib',
+#     'libcairo.2.dylib',          'libfreetype.6.dylib',
+#     'libgthread-2.0.0.dylib',    'libpcre.1.dylib',
+#     'libintl.8.dylib',           'libpangoft2-1.0.0.dylib',
+#     'libharfbuzz.0.dylib',       'libfontconfig.1.dylib',
+#     'libpixman-1.0.dylib',       'libpng16.16.dylib',
+#     'libgtk-quartz-2.0.0.dylib', 'libgdk-quartz-2.0.0.dylib',
+#     'libatk-1.0.0.dylib',        'libgdk_pixbuf-2.0.0.dylib',
+#     'libgio-2.0.0.dylib',        'libgmodule-2.0.0.dylib',
+#     'libssl.1.0.0.dylib',        'libcrypto.1.0.0.dylib',
+#     'libgdal.20.dylib',          'libproj.13.dylib',
+#     'libjson-c.4.dylib',         'libfreexl.1.dylib',
+#     'libgeos_c.1.dylib',         'libgif.7.dylib',
+#     'libjpeg.9.dylib',           'libgeotiff.2.dylib',
+#     'libtiff.5.dylib',           'libspatialite.7.dylib',
+#     'libgeos-3.7.0.dylib',       'liblwgeom.dylib',
+#     'libgnomecanvas-2.0.dylib',  'libart_lgpl_2.2.dylib',
+#     'libgailutil.18.dylib',      'libfribidi.0.dylib',
+#     'libzstd.1.dylib',
+#     '/usr/local/Cellar/libxml2/2.9.6/lib/libxml2.2.dylib',
+#     '/usr/local/Cellar/sqlite/3.21.0/lib/libsqlite3.0.dylib',
+#     'libgraphite2.3.dylib',
+# );
 
 
 
