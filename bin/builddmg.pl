@@ -73,8 +73,8 @@ sub remove_old_read_only_dmg() {
 sub copy_new_app() {
     # Copies the new Biodiverse.app to the mounted read/write dmg image.
     # Default is ../builds/Biodiverse.app.
-    print "copy $app into $input\n";
-    print "$app size is " . (-s $app); 
+    say "copy $app into $input";
+    say "$app size is " . (-s $app);
     my @copy_app_args = ("cp", "-r", "$app" , "$mounted");
     system(@copy_app_args) == 0
         or die "system @copy_app_args failed: $?";
@@ -159,4 +159,3 @@ Location of the mounted dmg image.
 Builds a dmg image of Biodiverse.
 
 =cut
-
