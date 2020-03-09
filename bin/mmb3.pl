@@ -30,6 +30,7 @@ my ($opt, $usage) = describe_options(
   [ 'lib_paths|l=s@',          'Paths to search for dynamic libraries'],
   [ 'pixbuf_loaders|p=s',      'The pixbuf loaders directory'],
   [ 'pixbuf_query_loader|q=s', 'The pixbuf query loader'],
+  [ 'gdk_pixbuf_dir=s',        'gdk_pixbuf_dir location'],
   [ 'hicolor|h=s',             'The hicolor shared directory'],
   [ 'verbose|v!',              'Verbose building?', {default => 0} ],
   [ 'execute|x!',              'Execute the script to find dependencies?', {default => 1} ],
@@ -45,19 +46,22 @@ if ($opt->help) {
 
 my $script            = $opt->script;
 my $verbose           = !!$opt->verbose;
-my $lib_paths         = $opt->lib_paths ? $opt->lib_paths : [q{/usr/local/opt}];
+my $lib_paths         = $opt->lib_paths || [q{/usr/local/opt}];
 my $execute           = $opt->execute ? '-x' : q{};
-my $pixbuf_loaders    = $opt->pixbuf_loaders ? $opt->pixbuf_loaders : q{/usr/local/opt/gdk-pixbuf/lib/gdk-pixbuf-2.0/2.10.0/loaders}; # need a way of finding this.
-my $pixbuf_query_loader     = $opt->pixbuf_query_loader ? $opt->pixbuf_query_loader : q{/usr/local/bin/gdk-pixbuf-query-loaders}; # need a way of finding this.
-my $hicolor_dir       = $opt->hicolor ? $opt->hicolor : q{/usr/local/share/icons/hicolor}; # need a way of finding this.
+my $pixbuf_loaders    = $opt->pixbuf_loaders || q{/usr/local/Cellar/gdk-pixbuf/2.38.0/lib/gdk-pixbuf-2.0/2.10.0/loaders}; # need a way of finding this.
+my $pixbuf_query_loader     = $opt->pixbuf_query_loader || q{/usr/local/Cellar/gdk-pixbuf/2.38.0/bin/gdk-pixbuf-query-loaders}; # need a way of finding this.
+my $gdk_pixbuf_dir    = $opt->gdk_pixbuf_dir || q{/usr/local/opt/gdk-pixbuf/lib/gdk-pixbuf-2.0};
+my $hicolor_dir       = $opt->hicolor || q{/usr/local/share/icons/hicolor}; # need a way of finding this.
 my @rest_of_pp_args   = @ARGV;
 
 die "Cannot find pixbuf loader location $pixbuf_loaders"
-  if !-e $pixbuf_loaders;
+  if !-d $pixbuf_loaders;
+die "Cannot find pixbuf loader location $gdk_pixbuf_dir"
+  if !-d $gdk_pixbuf_dir;
 die "Cannot find pixbuf query loader location $pixbuf_query_loader"
   if !-e $pixbuf_query_loader;
-die "Cannot find pixbuf query loader location $pixbuf_query_loader"
-  if !-e $hicolor_dir;
+die "Cannot find pixbuf query loader location $hicolor_dir"
+  if !-d $hicolor_dir;
 
 
 #die "Script file $script does not exist or is unreadable" if !-r $script;
@@ -455,23 +459,50 @@ get_xdg_data_dirs();
 
 
 for my $dir (@mime_dirs) {
-    my $mime_dir_abs  = Path::Class::file ($dir)->basename;
+    my $mime_dir_abs  = path ($dir)->basename;
     push @add_files, ('-a', "$dir\;$mime_dir_abs");
 }
 
+say "\n-----\n";
+
 # Add the pixbuf loaders directory
-my $pixbuf_loaders_abs  = Path::Class::dir ($pixbuf_loaders)->basename;
-push @add_files, ('-a', "$pixbuf_loaders\\;$pixbuf_loaders_abs/");
+# my $pixbuf_loaders_abs  = path ($pixbuf_loaders)->realpath->basename;
+# push @add_files, ('-a', "$pixbuf_loaders\;$pixbuf_loaders_abs");
+# say join ' ', @add_files;
+
 
 # Add the pixbuf query loader
 #$pixbuf_loader = Path::Class::file ('usr','local','bin','gdk-pixbuf-query-loaders')
-my $pixbuf_loader_abs  = Path::Class::file ($pixbuf_query_loader)->basename;
-push @add_files, ('-a', "$pixbuf_query_loader\;$pixbuf_loader_abs");
+# my $pixbuf_query_loader_abs  = path ($pixbuf_query_loader)->realpath->basename;
+# push @add_files, ('-a', "$pixbuf_query_loader\;$pixbuf_query_loader_abs");
+# say join ' ', @add_files;
+
+# my $gdk_pixbuf_dir_basename = path ($gdk_pixbuf_dir)->realpath->basename;
+# push @add_files, ('-a', "$gdk_pixbuf_dir\;$gdk_pixbuf_dir_basename"),
+# warn "++++++\n\n\n$gdk_pixbuf_dir\;$gdk_pixbuf_dir_basename+++++\n\n\n";
+# say join ' ', @add_files;
 
 # Add the hicolor directory
 #my $hicolor_dir = Path::Class::dir ('usr','local','share','icons','hicolor')
-my $hicolor_dir_abs  = Path::Class::dir ($hicolor_dir)->basename;
-push @add_files, ('-a', "$hicolor_dir\;icons/$hicolor_dir_abs");
+my $hicolor_dir_abs  = path ($hicolor_dir)->realpath->basename;
+# warn "++++++\n\n\n$hicolor_dir\;icons/$hicolor_dir_abs+++++\n\n\n";
+# push @add_files, ('-a', "$hicolor_dir\;icons/$hicolor_dir_abs");
+
+# say join ' ', @add_files;
+
+my @xxx;
+foreach my $dir ($pixbuf_loaders, $pixbuf_query_loader, $gdk_pixbuf_dir) {
+    my $basename = path ($dir)->realpath->basename;
+    push @xxx, ('-a', "$dir\;$basename");
+}
+push @xxx, ('-a', "$hicolor_dir\;icons/$hicolor_dir_abs");
+
+@add_files = (@add_files, @xxx);
+
+say join ' ', @add_files;
+say '-----';
+# my $zz = <>;
+
 
 # Add the ui directory
 my @ui_arg = ();
