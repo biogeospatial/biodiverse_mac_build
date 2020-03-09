@@ -465,30 +465,8 @@ for my $dir (@mime_dirs) {
 
 say "\n-----\n";
 
-# Add the pixbuf loaders directory
-# my $pixbuf_loaders_abs  = path ($pixbuf_loaders)->realpath->basename;
-# push @add_files, ('-a', "$pixbuf_loaders\;$pixbuf_loaders_abs");
-# say join ' ', @add_files;
-
-
-# Add the pixbuf query loader
-#$pixbuf_loader = Path::Class::file ('usr','local','bin','gdk-pixbuf-query-loaders')
-# my $pixbuf_query_loader_abs  = path ($pixbuf_query_loader)->realpath->basename;
-# push @add_files, ('-a', "$pixbuf_query_loader\;$pixbuf_query_loader_abs");
-# say join ' ', @add_files;
-
-# my $gdk_pixbuf_dir_basename = path ($gdk_pixbuf_dir)->realpath->basename;
-# push @add_files, ('-a', "$gdk_pixbuf_dir\;$gdk_pixbuf_dir_basename"),
-# warn "++++++\n\n\n$gdk_pixbuf_dir\;$gdk_pixbuf_dir_basename+++++\n\n\n";
-# say join ' ', @add_files;
-
 # Add the hicolor directory
-#my $hicolor_dir = Path::Class::dir ('usr','local','share','icons','hicolor')
 my $hicolor_dir_abs  = path ($hicolor_dir)->realpath->basename;
-# warn "++++++\n\n\n$hicolor_dir\;icons/$hicolor_dir_abs+++++\n\n\n";
-# push @add_files, ('-a', "$hicolor_dir\;icons/$hicolor_dir_abs");
-
-# say join ' ', @add_files;
 
 my @xxx;
 foreach my $dir ($pixbuf_loaders, $pixbuf_query_loader, $gdk_pixbuf_dir) {
@@ -497,10 +475,11 @@ foreach my $dir ($pixbuf_loaders, $pixbuf_query_loader, $gdk_pixbuf_dir) {
 }
 push @xxx, ('-a', "$hicolor_dir\;icons/$hicolor_dir_abs");
 
+#  clunky, but previous approach was sneaking a 1 into the array
 @add_files = (@add_files, @xxx);
 
 say join ' ', @add_files;
-say '-----';
+say "-----\n";
 # my $zz = <>;
 
 
