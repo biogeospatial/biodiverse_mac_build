@@ -47,10 +47,18 @@ my $script            = $opt->script;
 my $verbose           = !!$opt->verbose;
 my $lib_paths         = $opt->lib_paths ? $opt->lib_paths : [q{/usr/local/opt}];
 my $execute           = $opt->execute ? '-x' : q{};
-my @pixbuf_loaders    = $opt->pixbuf_loaders ? $opt->pixbuf_loaders : q{/usr/local/opt/gdk-pixbuf/lib/gdk-pixbuf-2.0/2.10.0/loaders}; # need a way of finding this.
-my @pixbuf_query_loader     = $opt->pixbuf_query_loader? $opt->pixbuf_query_loader : q{/usr/local/bin/gdk-pixbuf-query-loaders}; # need a way of finding this.
-my @hicolor           = $opt->hicolor ? $opt->hicolor : q{/usr/local/share/icons/hicolor}; # need a way of finding this.
+my $pixbuf_loaders    = $opt->pixbuf_loaders ? $opt->pixbuf_loaders : q{/usr/local/opt/gdk-pixbuf/lib/gdk-pixbuf-2.0/2.10.0/loaders}; # need a way of finding this.
+my $pixbuf_query_loader     = $opt->pixbuf_query_loader ? $opt->pixbuf_query_loader : q{/usr/local/bin/gdk-pixbuf-query-loaders}; # need a way of finding this.
+my $hicolor_dir       = $opt->hicolor ? $opt->hicolor : q{/usr/local/share/icons/hicolor}; # need a way of finding this.
 my @rest_of_pp_args   = @ARGV;
+
+die "Cannot find pixbuf loader location $pixbuf_loaders"
+  if !-e $pixbuf_loaders;
+die "Cannot find pixbuf query loader location $pixbuf_query_loader"
+  if !-e $pixbuf_query_loader;
+die "Cannot find pixbuf query loader location $pixbuf_query_loader"
+  if !-e $hicolor_dir;
+
 
 #die "Script file $script does not exist or is unreadable" if !-r $script;
 
@@ -99,6 +107,13 @@ our %dylib_files_hash;
 #
 #     %dylib_files_hash = map {basename ($_) => $_} @dylib_files_list;
 # }
+
+my @hard_coded_dylibs = (
+    #  hard code for now
+    '/usr/local/Cellar/openssl/1.0.2l/lib/libssl.1.0.0.dylib',
+    '/usr/local/Cellar/openssl/1.0.2l/lib/libcrypto.1.0.0.dylib',
+    '/usr/local/Cellar/libgnomecanvas/2.30.3_2/lib/libgnomecanvas-2.0.dylib',
+);
 
 my @links;
 my @dylibs;
@@ -296,7 +311,7 @@ sub get_dep_dlls {
     my $deps_hash = scan_deps(
         files   => [ $script ],
         recurse => 1,
-        execute => !$no_execute_flag,
+        execute => 1, #!$no_execute_flag,
         #cache_file => $cache_file,
     );
 
@@ -309,8 +324,8 @@ sub get_dep_dlls {
     my $inc_path_re = qr /^($paths)/i;
     #say $inc_path_re;
 
-    my $RE_DLL_EXT = qr/\.$Config::Config{so}/i;
-    $RE_DLL_EXT = qr/\.bundle$/;
+    my $RE_DLL_EXT = qr/\.($Config::Config{so}|bundle)$/i;
+    # $RE_DLL_EXT = qr/\.bundle$/;
 
     my %dll_hash;
     foreach my $package (keys %$deps_hash) {
@@ -352,10 +367,17 @@ sub get_inc_to_pack {
     #system ('otool', '-L', $bundle_list[0]);
     say '+++++';
 
-    my @libs_to_pack;
+    my @libs_to_pack = (
+        @hard_coded_dylibs,
+    );
     my %seen;
 
-    my @target_libs = (Alien::gdal->dynamic_libs, @bundle_list, '/usr/local/opt/libffi/lib/libffi.6.dylib');
+    my @target_libs = (
+        Alien::gdal->dynamic_libs,
+        @bundle_list,
+        '/usr/local/opt/libffi/lib/libffi.6.dylib',
+        @hard_coded_dylibs,
+    );
     while (my $lib = shift @target_libs) {
         say "otool -L $lib";
         my @lib_arr = qx /otool -L $lib/;
@@ -438,18 +460,18 @@ for my $dir (@mime_dirs) {
 }
 
 # Add the pixbuf loaders directory
-my $pixbuf_loaders_abs  = Path::Class::dir (@pixbuf_loaders)->basename;
-push @add_files, ('-a', "@pixbuf_loaders\\;$pixbuf_loaders_abs/");
+my $pixbuf_loaders_abs  = Path::Class::dir ($pixbuf_loaders)->basename;
+push @add_files, ('-a', "$pixbuf_loaders\\;$pixbuf_loaders_abs/");
 
 # Add the pixbuf query loader
 #$pixbuf_loader = Path::Class::file ('usr','local','bin','gdk-pixbuf-query-loaders')
-my $pixbuf_loader_abs  = Path::Class::file (@pixbuf_query_loader)->basename;
-push @add_files, ('-a', "@pixbuf_query_loader\;$pixbuf_loader_abs");
+my $pixbuf_loader_abs  = Path::Class::file ($pixbuf_query_loader)->basename;
+push @add_files, ('-a', "$pixbuf_query_loader\;$pixbuf_loader_abs");
 
 # Add the hicolor directory
 #my $hicolor_dir = Path::Class::dir ('usr','local','share','icons','hicolor')
-my $hicolor_dir_abs  = Path::Class::dir (@hicolor)->basename;
-push @add_files, ('-a', "@hicolor\;icons/$hicolor_dir_abs");
+my $hicolor_dir_abs  = Path::Class::dir ($hicolor_dir)->basename;
+push @add_files, ('-a', "$hicolor_dir\;icons/$hicolor_dir_abs");
 
 # Add the ui directory
 my @ui_arg = ();
@@ -522,7 +544,7 @@ system @cmd;
 
 
 sub icon_into_app_file {
-    #  also see 
+    #  also see
     #  https://stackoverflow.com/questions/8371790/how-to-set-icon-on-file-or-directory-using-cli-on-os-x
     #  https://apple.stackexchange.com/questions/6901/how-can-i-change-a-file-or-folder-icon-using-the-terminal
     my $target = "$root_dir/builds/Biodiverse.app/Icon\r";
