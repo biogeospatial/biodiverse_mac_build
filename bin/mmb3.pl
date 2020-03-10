@@ -44,17 +44,22 @@ if ($opt->help) {
     exit;
 }
 
+my $pixbuf_base = q{/usr/local/Cellar/gdk-pixbuf/2.38.0};
+# $pixbuf_base = q{/usr/local/Cellar/gdk-pixbuf/2.36.11};
+$pixbuf_base = q{/usr/local/opt/gdk-pixbuf};
+
+
 my $script            = $opt->script;
 my $verbose           = !!$opt->verbose;
 my $lib_paths         = $opt->lib_paths || [q{/usr/local/opt}];
 my $execute           = $opt->execute ? '-x' : q{};
-my $pixbuf_loaders    = $opt->pixbuf_loaders || q{/usr/local/Cellar/gdk-pixbuf/2.38.0/lib/gdk-pixbuf-2.0/2.10.0/loaders}; # need a way of finding this.
-my $pixbuf_query_loader     = $opt->pixbuf_query_loader || q{/usr/local/Cellar/gdk-pixbuf/2.38.0/bin/gdk-pixbuf-query-loaders}; # need a way of finding this.
-my $gdk_pixbuf_dir    = $opt->gdk_pixbuf_dir || q{/usr/local/opt/gdk-pixbuf/lib/gdk-pixbuf-2.0};
+my $pixbuf_loaders    = $opt->pixbuf_loaders || qq{$pixbuf_base/lib/gdk-pixbuf-2.0/2.10.0/loaders}; # need a way of finding this.
+my $pixbuf_query_loader     = $opt->pixbuf_query_loader || qq{$pixbuf_base/bin/gdk-pixbuf-query-loaders}; # need a way of finding this.
+my $gdk_pixbuf_dir    = $opt->gdk_pixbuf_dir || qq{$pixbuf_base/lib/gdk-pixbuf-2.0};
 my $hicolor_dir       = $opt->hicolor || q{/usr/local/share/icons/hicolor}; # need a way of finding this.
 my @rest_of_pp_args   = @ARGV;
 
-die "Cannot find pixbuf loader location $pixbuf_loaders"
+die "Cannot find pixbuf loader $pixbuf_loaders"
   if !-d $pixbuf_loaders;
 die "Cannot find pixbuf loader location $gdk_pixbuf_dir"
   if !-d $gdk_pixbuf_dir;
@@ -114,8 +119,11 @@ our %dylib_files_hash;
 
 my @hard_coded_dylibs = (
     #  hard code for now
-    '/usr/local/Cellar/openssl/1.0.2l/lib/libssl.1.0.0.dylib',
-    '/usr/local/Cellar/openssl/1.0.2l/lib/libcrypto.1.0.0.dylib',
+    # '/usr/local/Cellar/openssl/1.0.2p/lib/libssl.1.0.0.dylib',
+    # '"/usr/local/Cellar/openssl@1.1/1.1.1d/lib/libssl.1.1.dylib"',
+    # '"/usr/local/Cellar/openssl@1.1/1.1.1d/lib/libcrypto.1.0.0.dylib"',
+    "$root_dir/libssl.1.1.dylib",
+    "$root_dir/libcrypto.1.1.dylib",
     '/usr/local/Cellar/libgnomecanvas/2.30.3_2/lib/libgnomecanvas-2.0.dylib',
 );
 
@@ -361,6 +369,16 @@ sub get_dep_dlls {
     return wantarray ? @dll_list : \@dll_list;
 }
 
+sub find_so_files {
+    my $target_dir = shift or die;
+
+    my @files = File::Find::Rule->extras({ follow => 1, follow_skip=>2 })
+                             ->file()
+                             ->name( qr/\.so$/ )
+                             ->in( $target_dir );
+    return wantarray ? @files : \@files;
+}
+
 sub get_inc_to_pack {
     my $target_script = shift;
 
@@ -377,10 +395,12 @@ sub get_inc_to_pack {
     my %seen;
 
     my @target_libs = (
+        @hard_coded_dylibs,
         Alien::gdal->dynamic_libs,
         @bundle_list,
         '/usr/local/opt/libffi/lib/libffi.6.dylib',
-        @hard_coded_dylibs,
+        $pixbuf_query_loader,
+        find_so_files ($gdk_pixbuf_dir),
     );
     while (my $lib = shift @target_libs) {
         say "otool -L $lib";
@@ -450,7 +470,7 @@ sub get_xdg_data_dirs(){
     for my $dir (@xdg_data_dirs){
         if ( -d $dir . "/mime" ) {
             say "Found mime dir $dir" if $verbose;
-            push @mime_dirs, $dir . "/mime";
+            # push @mime_dirs, $dir . "/mime";
         }
     }
 }
@@ -469,11 +489,13 @@ say "\n-----\n";
 my $hicolor_dir_abs  = path ($hicolor_dir)->realpath->basename;
 
 my @xxx;
-foreach my $dir ($pixbuf_loaders, $pixbuf_query_loader, $gdk_pixbuf_dir) {
+push @xxx, ('-a', "$pixbuf_query_loader\;" . path ($pixbuf_query_loader)->realpath->basename);
+foreach my $dir ($pixbuf_loaders, $gdk_pixbuf_dir) {
     my $basename = path ($dir)->realpath->basename;
     push @xxx, ('-a', "$dir\;$basename");
 }
 push @xxx, ('-a', "$hicolor_dir\;icons/$hicolor_dir_abs");
+# push @xxx, ('-a', "$pixbuf_query_loader\;../" . path ($pixbuf_query_loader)->realpath->basename);
 
 #  clunky, but previous approach was sneaking a 1 into the array
 @add_files = (@add_files, @xxx);
