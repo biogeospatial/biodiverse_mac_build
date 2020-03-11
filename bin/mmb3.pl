@@ -10,8 +10,6 @@ local $| = 1;
 
 use Config;
 use File::Copy;
-use Path::Class;
-use Cwd;
 use Cwd 'abs_path';
 use File::Basename;
 use File::BaseDir qw/xdg_data_dirs/;
@@ -74,7 +72,7 @@ die "Cannot find pixbuf query loader location $hicolor_dir"
 
 #  assume bin folder is at parent folder level
 my $script_root_dir = path ($script)->parent->parent;
-my $root_dir = path($0)->parent->parent;
+my $root_dir = path($0)->parent->parent->absolute;
 say "Root dir is $root_dir";
 my $bin_folder = path ("$script_root_dir/bin");
 my $icon_file  = $opt->icon_file // path ($bin_folder, 'Biodiverse_icon.ico')->realpath;
@@ -84,7 +82,7 @@ my $out_folder   = $opt->out_folder // path ($root_dir, 'builds','Biodiverse.app
 
 my $perlpath     = $EXECUTABLE_NAME;
 
-my $script_fullname = Path::Class::file($script)->absolute;
+my $script_fullname = path ($script)->absolute;
 my $output_binary = basename ($script_fullname, '.pl', qr/\.[^.]*$/);
 
 if (!-d $out_folder) {
@@ -236,7 +234,7 @@ sub get_inc_to_pack {
     #    (@libs_to_pack, '/usr/local/opt/libffi/lib/libffi.6.dylib');
     my @inc_to_pack;
     foreach my $file (@libs_to_pack) {
-        my $basename = Path::Tiny::path($file)->basename;
+        my $basename = path($file)->basename;
         while (-l $file) {
             my $linked_file = readlink ($file);
             say "$file is a symbolic link that points to $linked_file";
@@ -298,11 +296,11 @@ say "-----\n";
 my @ui_arg = ();
 
 if ($script =~ 'BiodiverseGUI.pl') {
-    my $ui_dir = Path::Class::dir ($bin_folder, 'ui')->absolute;
+    my $ui_dir = path ($bin_folder, 'ui')->absolute;
     @ui_arg = ('-a', "$ui_dir\;ui");
 }
 
-my $output_binary_fullpath = Path::Class::file ($out_folder, $output_binary)->absolute;
+my $output_binary_fullpath = path ($out_folder, $output_binary)->absolute;
 
 my $icon_file_base = $icon_file ? basename ($icon_file) : '';
 my @icon_file_arg  = $icon_file ? ('-a', "$icon_file\;$icon_file_base") : ();
@@ -382,7 +380,7 @@ icon_into_app_file ();
 ###########################################
 sub build_dmg(){
     print "[build_dmg] Building dmg image...\n" if ($verbose);
-    my $builddmg = Path::Class::dir ($root_dir,'bin', 'builddmg.pl' );
+    my $builddmg = path ($root_dir,'bin', 'builddmg.pl' )->absolute->stringify;
     print "[build_dmg] build_dmg: $builddmg\n" if ($verbose);
     say "script root dir is $script_root_dir";
     say "PERL5LIB env var is " . ($ENV{PERL5LIB} // '');
