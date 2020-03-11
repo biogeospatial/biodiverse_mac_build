@@ -14,10 +14,12 @@ use Path::Class;
 use Cwd;
 use Cwd 'abs_path';
 use File::Basename;
-use File::Find;
+# use File::Find;
 use File::BaseDir qw/xdg_data_dirs/;
 use Path::Tiny qw/ path /;
 use Module::ScanDeps;
+use File::Find::Rule ();
+
 
 
 use Getopt::Long::Descriptive;
@@ -101,9 +103,6 @@ $ENV{BDV_PP_BUILDING}              = 1;
 $ENV{BIODIVERSE_EXTENSIONS_IGNORE} = 1;
 
 
-use File::Find::Rule ();
-our %dylib_files_hash;
-
 my @hard_coded_dylibs = (
     #  hard code for now
     # '/usr/local/Cellar/openssl/1.0.2p/lib/libssl.1.0.0.dylib',
@@ -113,86 +112,6 @@ my @hard_coded_dylibs = (
     "$root_dir/libcrypto.1.1.dylib",
     '/usr/local/Cellar/libgnomecanvas/2.30.3_2/lib/libgnomecanvas-2.0.dylib',
 );
-
-my @links;
-my @dylibs;
-
-# Find the absolute paths to each supplied
-# dynamic library. Each library is supplied
-# to pp with a -a and uses an alias. The alias
-# packs the library at the top level of the
-# Par:Packer archive. This is where the
-# Biodiverse binary will be able to find it.
-print "finding dynamic library paths\n";
-my %checked_dylib;
-for my $name (sort @dylibs) {
-    next if $checked_dylib{$name};
-    say "Checking location of $name";
-    my $lib = find_dylib_in_path($name, @$lib_paths);
-    my $filename = Path::Class::file ($name)->basename;
-    push @links, '-a', "$lib\;../$filename";
-    print "library $lib will be included as ../$filename\n" if ($verbose);
-    $checked_dylib{$name}++;
-}
-
-# Use otools the get the name proper of the dynamic
-# library.
-sub get_name_from_dynamic_lib {
-    my $lib = shift;
-
-    my $name;
-
-    chomp(my @ot = qx( otool -D $lib ));
-    if ($? == 0) {
-        $name = $ot[1];
-        print "otool: library $lib has install name $name\n" if ($verbose);
-    }
-    return $name;
-}
-
-
-# Search for a dynamic library
-# in the paths supplied.
-sub find_dylib_in_path {
-    my ($file, @path) = @_;
-
-
-    # If $file is an absolute path
-    # then return with a fully resolved
-    # file and path.
-    #return get_name_from_dynamic_lib($file) if -f $file;
-    return $file if -f $file;
-
-    return $dylib_files_hash{$file} if $dylib_files_hash{$file};
-
-    #  fallback search
-    say "Searching for file $file";
-
-    my $abs = "";
-    my $dlext = $^O eq 'darwin' ? 'dylib' : $Config{dlext};
-
-    # setup regular expressions variables
-    # Example of patterns
-    # Search pattern for finding dynamic libraries.
-    #  <PREFIX><NAME><DELIMITER><VERSION><EXTENSION>
-    # Examples:
-    # for name without anything:               ffi
-    # for name pattern prefix:name             libffi
-    # for name pattern name:version:           ffi.6
-    # for name pattern prefix:name:version:    libffi.6
-    # for name pattern prefix:name:version:ext libffi.6.dylib
-    for my $dir (@path) {
-        next if (! -d $dir);
-        $file  = substr $file, 0, -6 if $file =~ m/$dlext$/;
-        find ({wanted => sub {return unless /^(lib)*$file(\.|-)[\d*\.]*\.$dlext$/; $abs = $File::Find::name}, follow=>1, follow_skip=>2 },$dir );
-        find ({wanted => sub {return unless /^(lib)*$file\.$dlext$/; $abs = $File::Find::name}, follow=>1, follow_skip=>2 },$dir ) if ! $abs;
-        return $abs if $abs;
-        #print "could not file: $file\n" if (! $abs);
-    }
-    print "could not find file: $file\n" if (! $abs);
-    return $abs;
-}
-
 
 #  find dependent dlls
 #  could also adapt some of Module::ScanDeps::_compile_or_execute
@@ -423,7 +342,6 @@ my @cmd = (
     @ui_arg,
     @icon_file_arg,
     $execute,
-    #@links,
     @inc_to_pack,
     @add_files,
     @rest_of_pp_args,
@@ -440,6 +358,7 @@ if ($verbose) {
 say join ' ', "\nCOMMAND TO RUN:\n", @cmd;
 
 system @cmd;
+# die $? if $?;
 
 
 #  not sure this works
