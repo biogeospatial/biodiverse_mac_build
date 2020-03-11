@@ -140,7 +140,7 @@ for my $name (sort @dylibs) {
 # DYLD_LIBRARY_PATH and LD_LIBRARY_PATH.
 # These are exported as temportary environmental variables
 # when pp is run.
-create_lib_paths();
+# create_lib_paths();
 
 # Use otools the get the name proper of the dynamic
 # library.
@@ -203,22 +203,22 @@ sub find_dylib_in_path {
 # Create the DYLD_LIBRARY_PATH
 # and LD_LIBRARY_PATH environmental
 # variables.
-my $dyld_library_path = "DYLD_LIBRARY_PATH=inc:/System/Library/Frameworks/ImageIO.framework/Versions/A/Resources/:";
-my $ld_library_path = "LD_LIBRARY_PATH=inc:/System/Library/Frameworks/ImageIO.framework/Versions/A/Resources/:";
-
-sub create_lib_paths {
-   for my $name (@$lib_paths){
-        $dyld_library_path .= $name . ":" . "inc" . $name . ":";
-        $ld_library_path   .= $name . ":" . "inc" . $name . ":";
-    }
-
-    chop $dyld_library_path;
-    chop $ld_library_path;
-    print "[create_lib_paths] \$dyld_library_path: $dyld_library_path\n"
-      if $verbose;
-    print "[create_lib_paths] \$ld_library_path: $ld_library_path\n"
-      if $verbose;
-}
+# my $dyld_library_path = "DYLD_LIBRARY_PATH=inc:/System/Library/Frameworks/ImageIO.framework/Versions/A/Resources/:";
+# my $ld_library_path = "LD_LIBRARY_PATH=inc:/System/Library/Frameworks/ImageIO.framework/Versions/A/Resources/:";
+#
+# sub create_lib_paths {
+#    for my $name (@$lib_paths){
+#         $dyld_library_path .= $name . ":" . "inc" . $name . ":";
+#         $ld_library_path   .= $name . ":" . "inc" . $name . ":";
+#     }
+#
+#     chop $dyld_library_path;
+#     chop $ld_library_path;
+#     print "[create_lib_paths] \$dyld_library_path: $dyld_library_path\n"
+#       if $verbose;
+#     print "[create_lib_paths] \$ld_library_path: $ld_library_path\n"
+#       if $verbose;
+# }
 
 
 #  find dependent dlls
@@ -435,8 +435,8 @@ my @icon_file_arg  = $icon_file ? ('-a', "$icon_file\;$icon_file_base") : ();
 ###########################################
 
 # export the dynamic library paths environmental variables.
-$ENV{DYLD_LIBRARY_PATH} = $dyld_library_path;
-$ENV{LD_LIBRARY_PATH} = $ld_library_path;
+# $ENV{DYLD_LIBRARY_PATH} = $dyld_library_path;
+# $ENV{LD_LIBRARY_PATH} = $ld_library_path;
 
 #  we need to use -M with the aliens,
 #  and possibly some others
