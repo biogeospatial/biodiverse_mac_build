@@ -14,7 +14,6 @@ use Path::Class;
 use Cwd;
 use Cwd 'abs_path';
 use File::Basename;
-# use File::Find;
 use File::BaseDir qw/xdg_data_dirs/;
 use Path::Tiny qw/ path /;
 use Module::ScanDeps;
@@ -74,14 +73,14 @@ die "Cannot find pixbuf query loader location $hicolor_dir"
 #die "Script file $script does not exist or is unreadable" if !-r $script;
 
 #  assume bin folder is at parent folder level
-my $script_root_dir = Path::Class::file ($script)->dir->parent;
-my $root_dir = Path::Class::file ($0)->dir->parent;
-say "Root dir is " . Path::Class::dir ($root_dir)->absolute->resolve;
-my $bin_folder = Path::Class::dir ($script_root_dir, 'bin');
-my $icon_file  = $opt->icon_file // Path::Class::file ($bin_folder, 'Biodiverse_icon.ico')->absolute->resolve;
+my $script_root_dir = path ($script)->parent->parent;
+my $root_dir = path($0)->parent->parent;
+say "Root dir is $root_dir";
+my $bin_folder = path ("$script_root_dir/bin");
+my $icon_file  = $opt->icon_file // path ($bin_folder, 'Biodiverse_icon.ico')->realpath;
 say "Icon file is $icon_file";
 
-my $out_folder   = $opt->out_folder // Path::Class::dir ($root_dir, 'builds','Biodiverse.app','Contents','MacOS');
+my $out_folder   = $opt->out_folder // path ($root_dir, 'builds','Biodiverse.app','Contents','MacOS');
 
 my $perlpath     = $EXECUTABLE_NAME;
 
