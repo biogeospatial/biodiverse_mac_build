@@ -135,13 +135,6 @@ for my $name (sort @dylibs) {
     $checked_dylib{$name}++;
 }
 
-# Setup the paths to export
-# as the environmental variables
-# DYLD_LIBRARY_PATH and LD_LIBRARY_PATH.
-# These are exported as temportary environmental variables
-# when pp is run.
-# create_lib_paths();
-
 # Use otools the get the name proper of the dynamic
 # library.
 sub get_name_from_dynamic_lib {
@@ -199,26 +192,6 @@ sub find_dylib_in_path {
     print "could not find file: $file\n" if (! $abs);
     return $abs;
 }
-
-# Create the DYLD_LIBRARY_PATH
-# and LD_LIBRARY_PATH environmental
-# variables.
-# my $dyld_library_path = "DYLD_LIBRARY_PATH=inc:/System/Library/Frameworks/ImageIO.framework/Versions/A/Resources/:";
-# my $ld_library_path = "LD_LIBRARY_PATH=inc:/System/Library/Frameworks/ImageIO.framework/Versions/A/Resources/:";
-#
-# sub create_lib_paths {
-#    for my $name (@$lib_paths){
-#         $dyld_library_path .= $name . ":" . "inc" . $name . ":";
-#         $ld_library_path   .= $name . ":" . "inc" . $name . ":";
-#     }
-#
-#     chop $dyld_library_path;
-#     chop $ld_library_path;
-#     print "[create_lib_paths] \$dyld_library_path: $dyld_library_path\n"
-#       if $verbose;
-#     print "[create_lib_paths] \$ld_library_path: $ld_library_path\n"
-#       if $verbose;
-# }
 
 
 #  find dependent dlls
@@ -375,18 +348,6 @@ sub get_inc_to_pack {
 my @add_files;
 my @mime_dirs;
 
-# sub get_xdg_data_dirs(){
-#     my @xdg_data_dirs = xdg_data_dirs;
-#     for my $dir (@xdg_data_dirs){
-#         if ( -d $dir . "/mime" ) {
-#             say "Found mime dir $dir" if $verbose;
-#             # push @mime_dirs, $dir . "/mime";
-#         }
-#     }
-# }
-# # Add the  mime types directory.
-# get_xdg_data_dirs();
-
 
 for my $dir (@mime_dirs) {
     my $mime_dir_abs  = path ($dir)->basename;
@@ -433,10 +394,6 @@ my @icon_file_arg  = $icon_file ? ('-a', "$icon_file\;$icon_file_base") : ();
 # Run the constructed pp command.
 #
 ###########################################
-
-# export the dynamic library paths environmental variables.
-# $ENV{DYLD_LIBRARY_PATH} = $dyld_library_path;
-# $ENV{LD_LIBRARY_PATH} = $ld_library_path;
 
 #  we need to use -M with the aliens,
 #  and possibly some others
