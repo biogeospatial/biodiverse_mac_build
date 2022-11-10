@@ -115,7 +115,7 @@ my @hard_coded_dylibs = (
     # '"/usr/local/Cellar/openssl@1.1/1.1.1d/lib/libcrypto.1.0.0.dylib"',
     "$root_dir/libssl.1.1.dylib",
     "$root_dir/libcrypto.1.1.dylib",
-    '/usr/local/Cellar/libgnomecanvas/2.30.3_2/lib/libgnomecanvas-2.0.dylib',
+    '$ENV{HOMEBREW_PREFIX}/Cellar/libgnomecanvas/2.30.3_5/lib/libgnomecanvas-2.0.dylib',
 );
 
 #  find dependent dlls
