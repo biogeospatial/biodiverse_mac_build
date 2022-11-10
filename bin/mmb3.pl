@@ -16,6 +16,7 @@ use File::BaseDir qw/xdg_data_dirs/;
 use Path::Tiny qw/ path /;
 use Module::ScanDeps;
 use File::Find::Rule ();
+use File::Which qw /which/;
 
 
 
@@ -43,19 +44,26 @@ if ($opt->help) {
     exit;
 }
 
-my $pixbuf_base = q{/usr/local/Cellar/gdk-pixbuf/2.38.0};
-# $pixbuf_base = q{/usr/local/Cellar/gdk-pixbuf/2.36.11};
-$pixbuf_base = q{/usr/local/opt/gdk-pixbuf};
+my $pixbuf_loader = `which gdk-pixbuf-query-loaders`;
+chomp $pixbuf_loader;
+#say STDERR "HHHHHH $pixbuf_loader";
+my @tmp = grep {/LoaderDir/} `$pixbuf_loader`;
+my $pixbuf_loader_dir = shift @tmp;
+$pixbuf_loader_dir =~ s/^.+= //;
+chomp $pixbuf_loader_dir;
+
+#say STDERR "kkkkk $pixbuf_base";
 
 
 my $script            = $opt->script;
 my $verbose           = !!$opt->verbose;
-my $lib_paths         = $opt->lib_paths || [q{/usr/local/opt}];
+my $lib_paths         = $opt->lib_paths || [$ENV{HOMEBREW_PREFIX}, '/opt', '/usr/local/opt'];
 my $execute           = $opt->execute ? '-x' : q{};
-my $pixbuf_loaders    = $opt->pixbuf_loaders || qq{$pixbuf_base/lib/gdk-pixbuf-2.0/2.10.0/loaders}; # need a way of finding this.
-my $pixbuf_query_loader     = $opt->pixbuf_query_loader || qq{$pixbuf_base/bin/gdk-pixbuf-query-loaders}; # need a way of finding this.
-my $gdk_pixbuf_dir    = $opt->gdk_pixbuf_dir || qq{$pixbuf_base/lib/gdk-pixbuf-2.0};
-my $hicolor_dir       = $opt->hicolor || q{/usr/local/share/icons/hicolor}; # need a way of finding this.
+my $pixbuf_loaders    = $opt->pixbuf_loaders || $pixbuf_loader_dir;
+my $pixbuf_query_loader     = $opt->pixbuf_query_loader || $pixbuf_loader;
+my $gdk_pixbuf_dir    = $opt->gdk_pixbuf_dir || path ($pixbuf_loader_dir)->parent->parent;
+my $hicolor_dir       = $opt->hicolor || "$ENV{HOMEBREW_PREFIX}/share/icons/hicolor";
+# q{/usr/local/share/icons/hicolor}; # need a way of finding this.
 my @rest_of_pp_args   = @ARGV;
 
 die "Cannot find pixbuf loader $pixbuf_loaders"
