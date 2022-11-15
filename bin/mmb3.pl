@@ -106,6 +106,7 @@ if (!-d $out_folder) {
 #  File::BOM dep are otherwise not found
 $ENV{BDV_PP_BUILDING}              = 1;
 $ENV{BIODIVERSE_EXTENSIONS_IGNORE} = 1;
+$ENV{BD_NO_GUI_DEV_WARN} = 1;
 
 
 my @hard_coded_dylibs = (
@@ -113,9 +114,9 @@ my @hard_coded_dylibs = (
     # '/usr/local/Cellar/openssl/1.0.2p/lib/libssl.1.0.0.dylib',
     # '"/usr/local/Cellar/openssl@1.1/1.1.1d/lib/libssl.1.1.dylib"',
     # '"/usr/local/Cellar/openssl@1.1/1.1.1d/lib/libcrypto.1.0.0.dylib"',
-    "$root_dir/libssl.1.1.dylib",
-    "$root_dir/libcrypto.1.1.dylib",
-    '$ENV{HOMEBREW_PREFIX}/Cellar/libgnomecanvas/2.30.3_5/lib/libgnomecanvas-2.0.dylib',
+    #"$root_dir/libssl.1.1.dylib",
+    #"$root_dir/libcrypto.1.1.dylib",
+    #'$ENV{HOMEBREW_PREFIX}/Cellar/libgnomecanvas/2.30.3_5/lib/libgnomecanvas-2.0.dylib',
 );
 
 #  find dependent dlls
