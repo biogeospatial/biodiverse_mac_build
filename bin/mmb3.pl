@@ -338,7 +338,8 @@ foreach my $alien (@aliens) {
     }
 }
 
-my @inc_to_pack = get_inc_to_pack ($script_fullname);
+#  this is handled by pp_autolink now
+#my @inc_to_pack = get_inc_to_pack ($script_fullname);
 
 my @verbose_command = $verbose ? ("-v") : ();
 
