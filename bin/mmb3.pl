@@ -370,6 +370,8 @@ say join ' ', "\nCOMMAND TO RUN:\n", @cmd;
 system @cmd;
 die $? if $?;
 
+say 'Updating binary in preparation for code signing';
+system ("pp_osx_codesign_fix", $output_binary_fullpath);
 
 #  not sure this works
 sub icon_into_app_file {
