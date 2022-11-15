@@ -325,6 +325,8 @@ my @icon_file_arg  = $icon_file ? ('-a', "$icon_file\;$icon_file_base") : ();
 my @aliens = qw /
     Alien::gdal       Alien::geos::af
     Alien::proj       Alien::sqlite
+    Alien::libtiff    Alien::curl
+    Alien::spatialite Alien::freexl
     File::ShareDir
 /;
 #    Alien::spatialite Alien::freexl
@@ -338,17 +340,22 @@ foreach my $alien (@aliens) {
 
 my @inc_to_pack = get_inc_to_pack ($script_fullname);
 
+my @verbose_command = $verbose ? ("-v") : ();
+
+my $pp_autolink = `which pp_autolink.pl`;
+chomp $pp_autolink;
+my @pp_cmd = ($^X, $pp_autolink);
 my @cmd = (
-    'pp',
-    #$verbose,
-    '-u',
+    @pp_cmd,
+    @verbose_command,
+    # '-u', # not needed post perl 5.31.6
     '-B',
     '-z',
     9,
     @ui_arg,
     @icon_file_arg,
     $execute,
-    @inc_to_pack,
+    #@inc_to_pack,
     @add_files,
     @rest_of_pp_args,
     '-o',
@@ -356,15 +363,11 @@ my @cmd = (
     $script_fullname,
 );
 
-if ($verbose) {
-    my @verbose_command = $verbose ? ("-v") : ();
-    splice @cmd, 1, 0, @verbose_command;
-}
 
 say join ' ', "\nCOMMAND TO RUN:\n", @cmd;
 
 system @cmd;
-# die $? if $?;
+die $? if $?;
 
 
 #  not sure this works
