@@ -339,7 +339,7 @@ foreach my $alien (@aliens) {
 }
 
 #  this is handled by pp_autolink now
-#my @inc_to_pack = get_inc_to_pack ($script_fullname);
+my @inc_to_pack = get_inc_to_pack ($script_fullname);
 
 my @verbose_command = $verbose ? ("-v") : ();
 
@@ -356,7 +356,7 @@ my @cmd = (
     @ui_arg,
     @icon_file_arg,
     $execute,
-    #@inc_to_pack,
+    # @inc_to_pack,
     @add_files,
     @rest_of_pp_args,
     '-o',
@@ -370,8 +370,8 @@ say join ' ', "\nCOMMAND TO RUN:\n", @cmd;
 system @cmd;
 die $? if $?;
 
-say 'Updating binary in preparation for code signing';
-system ("pp_osx_codesign_fix", $output_binary_fullpath);
+# say 'Updating binary in preparation for code signing';
+# system ("pp_osx_codesign_fix", $output_binary_fullpath);
 
 #  not sure this works
 sub icon_into_app_file {
