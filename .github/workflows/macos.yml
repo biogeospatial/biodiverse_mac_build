@@ -192,6 +192,7 @@ jobs:
       - name: Run mmb3.pl
         run: |
           eval "$(brew shellenv)"
+          export PATH=/Users/runner/perl5/bin:$PATH
           which -a pp
           echo $SHELL
           perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl
