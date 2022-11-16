@@ -20,12 +20,13 @@ jobs:
     runs-on: macOS-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Probe wd
         run: |
           pwd
           ls -l
+          brew shellenv
           
       - name: Probe /usr/lib etc
         run: |
@@ -56,17 +57,24 @@ jobs:
       
       - name: Install libgnomecanvas and cuckoo our patched dylib across
         run: |
+          eval "$(brew shellenv)"
           brew install libgnomecanvas
-          find ${HOMEBREW_PREFIX} libgnomecanvas-2.0.dylib
-#          sudo cp libgnomecanvas-2.0.dylib ${HOMEBREW_PREFIX}/Cellar/libgnomecanvas/2.30.3_4/lib/libgnomecanvas-2.0.dylib
-#          ls -lR /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib
+          echo Homebrew prefix is ${HOMEBREW_PREFIX}
+          echo Finding lignomecanvas dylibs
+          find ${HOMEBREW_CELLAR}/libgnomecanvas -name 'libgnomecanvas-2.0.dylib' -ls
+          lgc=$(find ${HOMEBREW_CELLAR}/libgnomecanvas -name 'libgnomecanvas-2.0.dylib' | head -1)
+          echo ${lgc}
+          #sudo cp libgnomecanvas-2.0.dylib ${HOMEBREW_PREFIX}/Cellar/libgnomecanvas/2.30.3_4/lib/libgnomecanvas-2.0.dylib
+          sudo cp libgnomecanvas-2.0.dylib ${lgc}
+          #ls -lR $lgc /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib
         
 
       - name: Set up Perl
         run: |
           brew install perl
           curl https://cpanmin.us | perl - App::cpanminus -n
-          echo "##[add-path]/Users/runner/perl5/bin"
+          # echo "##[add-path]/Users/runner/perl5/bin"
+          echo "/Users/runner/perl5/bin" >> $GITHUB_PATH
 
       - name: perl -V
         run: perl -V
@@ -82,7 +90,7 @@ jobs:
       #  run: rm ~/perl5/${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
 
       - name: Cache CPAN modules
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/perl5
           key: ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
@@ -91,13 +99,16 @@ jobs:
 
       - name: Install cpan deps 
         run: |
+          cpanm -v App::PP::Autolink
+          which pp_autolink.pl
+          which -a pp
           #  no share install for Alien::MSYS
           cpanm --notest Alien::MSYS
           #  ensure share install for gdal et al
-          ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
-          ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
+          #ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
+          #ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
           #ALIEN_INSTALL_TYPE=share cpanm --notest -v https://github.com/shawnlaffan/perl-alien-gdal.git
-          cpanm --notest Task::Biodiverse::NoGUI
+          #cpanm --notest Task::Biodiverse::NoGUI
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest ExtUtils::Depends
           cpanm --notest Gtk2
@@ -106,28 +117,29 @@ jobs:
           cpanm --notest PAR::Packer
           cpanm --notest File::BaseDir
           cpanm --notest File::Find::Rule
-      
-      - name: pack gdal script
-        run: |
-          echo "========"
-          perl pp_gdal_check.pl
-          echo "========"
-          echo Running packed exe
-          ./pp_gdal_check
-          echo "========"
-          echo Running with /usr/local dirs out of the way
-          sudo mv ${HOMEBREW_PREFIX} ${HOMEBREW_PREFIX}__
-          ./pp_gdal_check
-          echo Putting ${HOMEBREW_PREFIX} dirs back
-          sudo mv ${HOMEBREW_PREFIX}__ ${HOMEBREW_PREFIX}
-          echo "========"
           
-      - name: Upload checkpp artefact
-        uses: actions/upload-artifact@v1
-        with:
-          name: pp_gdal_check
-          #path: ${DMG_FILE_NAME}
-          path: ./pp_gdal_check
+      
+#      - name: pack gdal script
+#        run: |
+#          echo "========"
+#          perl pp_gdal_check.pl
+#          echo "========"
+#          echo Running packed exe
+#          ./pp_gdal_check
+#          echo "========"
+#          echo Running with /usr/local dirs out of the way
+#          sudo mv ${HOMEBREW_PREFIX} ${HOMEBREW_PREFIX}__
+#          ./pp_gdal_check
+#          echo Putting ${HOMEBREW_PREFIX} dirs back
+#          sudo mv ${HOMEBREW_PREFIX}__ ${HOMEBREW_PREFIX}
+#          echo "========"
+          
+#      - name: Upload checkpp artefact
+#        uses: actions/upload-artifact@v1
+#        with:
+#          name: pp_gdal_check
+#          #path: ${DMG_FILE_NAME}
+#          path: ./pp_gdal_check
       
 #      - name: Test pack
 #        run: |
@@ -166,7 +178,12 @@ jobs:
 #          path: ./checkpp
 
       - name: Clone biodiverse repo
-        run: git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
+        run: | 
+          git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
+          cd biodiverse
+          cpanm --installdeps .
+          prove t/00-load.t
+          cd -
         
       #- name: Check Biodiverse can run
       #  run: prove -l biodiverse/t
@@ -175,28 +192,33 @@ jobs:
         run: hdiutil resize -size 75MB ./images/Biodiverse.dmg
       
       - name: Run mmb3.pl
-        run: perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl
+        run: |
+          eval "$(brew shellenv)"
+          export PATH=/Users/runner/perl5/bin:$PATH
+          which -a pp
+          echo $SHELL
+          perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl
         
       - name: Find dmg file
         run: |
           export DMG_FILE_NAME=`find ./builds -name Biodiverse-*.dmg -print`
           echo ${DMG_FILE_NAME}
           
-      - name: Try to run the app
-        run: |
-          echo With system /usr/local/opt in path
-          BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
-          #  we need the brewed libs out of the way for this check
-          echo Moving /usr/local/lib
-          sudo mv /usr/local/lib /usr/local/libx
-          BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
-          echo Returning /usr/local/lib
-          sudo mv /usr/local/libx /usr/local/lib
+#      - name: Try to run the app
+#        run: |
+#          echo With system /usr/local/opt in path
+#          BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
+#          #  we need the brewed libs out of the way for this check
+#          echo Moving /usr/local/lib
+#          sudo mv /usr/local/lib /usr/local/libx
+#          BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
+#          echo Returning /usr/local/lib
+#          sudo mv /usr/local/libx /usr/local/lib
           
         
       - name: Upload artefact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: dmg-file
           #path: ${DMG_FILE_NAME}
-          path: ./builds/Biodiverse-3.99_005-2.dmg
+          path: ./builds/Biodiverse-3.*.dmg
