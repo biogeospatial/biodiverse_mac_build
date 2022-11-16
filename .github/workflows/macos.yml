@@ -57,6 +57,7 @@ jobs:
       
       - name: Install libgnomecanvas and cuckoo our patched dylib across
         run: |
+          eval "$(brew shellenv)"
           brew install libgnomecanvas
           echo ${HOMEBREW_PREFIX}
           lgc=$(find /usr/local -name 'libgnomecanvas-2.0.dylib' | head -1)
@@ -186,7 +187,9 @@ jobs:
         run: hdiutil resize -size 75MB ./images/Biodiverse.dmg
       
       - name: Run mmb3.pl
-        run: perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl
+        run: |
+          eval "$(brew shellenv)"
+          perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl
         
       - name: Find dmg file
         run: |
