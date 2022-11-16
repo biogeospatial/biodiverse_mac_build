@@ -103,6 +103,7 @@ say 'removing app';
 remove_app();
 remove_old_read_only_dmg();
 copy_new_app();
+sleep(1);  #  maybe avoid some resource clashes
 unmount_read_write_dmg();
 create_new_dmg();
 
