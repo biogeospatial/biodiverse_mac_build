@@ -98,10 +98,10 @@ jobs:
           #  no share install for Alien::MSYS
           cpanm --notest Alien::MSYS
           #  ensure share install for gdal et al
-          ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
-          ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
+          #ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
+          #ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
           #ALIEN_INSTALL_TYPE=share cpanm --notest -v https://github.com/shawnlaffan/perl-alien-gdal.git
-          cpanm --notest Task::Biodiverse::NoGUI
+          #cpanm --notest Task::Biodiverse::NoGUI
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest ExtUtils::Depends
           cpanm --notest Gtk2
@@ -110,6 +110,7 @@ jobs:
           cpanm --notest PAR::Packer
           cpanm --notest File::BaseDir
           cpanm --notest File::Find::Rule
+          cpanm App::PP::Autolink
       
       - name: pack gdal script
         run: |
@@ -170,7 +171,11 @@ jobs:
 #          path: ./checkpp
 
       - name: Clone biodiverse repo
-        run: git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
+        run: | 
+          git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
+          cd biodiverse
+          cpanm --installdeps .
+          cd -
         
       #- name: Check Biodiverse can run
       #  run: prove -l biodiverse/t
