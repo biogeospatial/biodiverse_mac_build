@@ -59,6 +59,7 @@ jobs:
           brew install libgnomecanvas
           echo ${HOMEBREW_PREFIX}
           lgc=$(find /usr/local -name 'libgnomecanvas-2.0.dylib' | head -1)
+          echo $lgc
           #sudo cp libgnomecanvas-2.0.dylib ${HOMEBREW_PREFIX}/Cellar/libgnomecanvas/2.30.3_4/lib/libgnomecanvas-2.0.dylib
           #sudo cp libgnomecanvas-2.0.dylib ${lgc}
           #ls -lR $lgc /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib
