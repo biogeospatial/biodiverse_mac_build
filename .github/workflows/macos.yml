@@ -175,6 +175,7 @@ jobs:
           git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
           cpanm --installdeps .
+          prove t/00-load.t
           cd -
         
       #- name: Check Biodiverse can run
@@ -183,18 +184,18 @@ jobs:
       - name: Resize dmg file
         run: hdiutil resize -size 75MB ./images/Biodiverse.dmg
       
-#      - name: Run mmb3.pl
-#        run: perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl
+      - name: Run mmb3.pl
+        run: perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl
         
-#      - name: Find dmg file
-#        run: |
-#          export DMG_FILE_NAME=`find ./builds -name Biodiverse-*.dmg -print`
-#          echo ${DMG_FILE_NAME}
+      - name: Find dmg file
+        run: |
+          export DMG_FILE_NAME=`find ./builds -name Biodiverse-*.dmg -print`
+          echo ${DMG_FILE_NAME}
           
-#      - name: Try to run the app
-#        run: |
-#          echo With system /usr/local/opt in path
-#          BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
+      - name: Try to run the app
+        run: |
+          echo With system /usr/local/opt in path
+          BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
 #          #  we need the brewed libs out of the way for this check
 #          echo Moving /usr/local/lib
 #          sudo mv /usr/local/lib /usr/local/libx
@@ -203,9 +204,9 @@ jobs:
 #          sudo mv /usr/local/libx /usr/local/lib
           
         
-#      - name: Upload artefact
-#        uses: actions/upload-artifact@v1
-#        with:
-#          name: dmg-file
-#          #path: ${DMG_FILE_NAME}
-#          path: ./builds/Biodiverse-3.99_005-2.dmg
+      - name: Upload artefact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dmg-file
+          #path: ${DMG_FILE_NAME}
+          path: ./builds/Biodiverse-3.*.dmg
