@@ -202,10 +202,10 @@ jobs:
           export DMG_FILE_NAME=`find ./builds -name Biodiverse-*.dmg -print`
           echo ${DMG_FILE_NAME}
           
-      - name: Try to run the app
-        run: |
-          echo With system /usr/local/opt in path
-          BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
+#      - name: Try to run the app
+#        run: |
+#          echo With system /usr/local/opt in path
+#          BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
 #          #  we need the brewed libs out of the way for this check
 #          echo Moving /usr/local/lib
 #          sudo mv /usr/local/lib /usr/local/libx
