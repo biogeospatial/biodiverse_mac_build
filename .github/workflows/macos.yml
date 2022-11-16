@@ -26,6 +26,7 @@ jobs:
         run: |
           pwd
           ls -l
+          brew shellenv
           
       - name: Probe /usr/lib etc
         run: |
