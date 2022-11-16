@@ -112,27 +112,27 @@ jobs:
           cpanm --notest File::Find::Rule
           cpanm App::PP::Autolink
       
-      - name: pack gdal script
-        run: |
-          echo "========"
-          perl pp_gdal_check.pl
-          echo "========"
-          echo Running packed exe
-          ./pp_gdal_check
-          echo "========"
-          echo Running with /usr/local dirs out of the way
-          sudo mv ${HOMEBREW_PREFIX} ${HOMEBREW_PREFIX}__
-          ./pp_gdal_check
-          echo Putting ${HOMEBREW_PREFIX} dirs back
-          sudo mv ${HOMEBREW_PREFIX}__ ${HOMEBREW_PREFIX}
-          echo "========"
+#      - name: pack gdal script
+#        run: |
+#          echo "========"
+#          perl pp_gdal_check.pl
+#          echo "========"
+#          echo Running packed exe
+#          ./pp_gdal_check
+#          echo "========"
+#          echo Running with /usr/local dirs out of the way
+#          sudo mv ${HOMEBREW_PREFIX} ${HOMEBREW_PREFIX}__
+#          ./pp_gdal_check
+#          echo Putting ${HOMEBREW_PREFIX} dirs back
+#          sudo mv ${HOMEBREW_PREFIX}__ ${HOMEBREW_PREFIX}
+#          echo "========"
           
-      - name: Upload checkpp artefact
-        uses: actions/upload-artifact@v1
-        with:
-          name: pp_gdal_check
-          #path: ${DMG_FILE_NAME}
-          path: ./pp_gdal_check
+#      - name: Upload checkpp artefact
+#        uses: actions/upload-artifact@v1
+#        with:
+#          name: pp_gdal_check
+#          #path: ${DMG_FILE_NAME}
+#          path: ./pp_gdal_check
       
 #      - name: Test pack
 #        run: |
