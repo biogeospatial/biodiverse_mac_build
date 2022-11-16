@@ -99,6 +99,7 @@ jobs:
         run: |
           cpanm -v App::PP::Autolink
           which pp_autolink.pl
+          which -a pp
           #  no share install for Alien::MSYS
           cpanm --notest Alien::MSYS
           #  ensure share install for gdal et al
