@@ -20,7 +20,7 @@ jobs:
     runs-on: macOS-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Probe wd
         run: |
@@ -61,11 +61,11 @@ jobs:
           brew install libgnomecanvas
           echo Homebrew prefix is ${HOMEBREW_PREFIX}
           echo Finding lignomecanvas dylibs
-          find ${HOMEBREW_PREFIX} -name 'libgnomecanvas-2.0.dylib' -ls
-          lgc=$(find ${HOMEBREW_PREFIX} -name 'libgnomecanvas-2.0.dylib' | head -1)
-          echo $lgc
+          find ${HOMEBREW_CELLAR}/libgnomecanvas -name 'libgnomecanvas-2.0.dylib' -ls
+          lgc=$(find ${HOMEBREW_CELLAR}/libgnomecanvas -name 'libgnomecanvas-2.0.dylib' | head -1)
+          echo ${lgc}
           #sudo cp libgnomecanvas-2.0.dylib ${HOMEBREW_PREFIX}/Cellar/libgnomecanvas/2.30.3_4/lib/libgnomecanvas-2.0.dylib
-          #sudo cp libgnomecanvas-2.0.dylib ${lgc}
+          sudo cp libgnomecanvas-2.0.dylib ${lgc}
           #ls -lR $lgc /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib
         
 
