@@ -57,9 +57,10 @@ jobs:
       - name: Install libgnomecanvas and cuckoo our patched dylib across
         run: |
           brew install libgnomecanvas
-          find ${HOMEBREW_PREFIX} libgnomecanvas-2.0.dylib
-#          sudo cp libgnomecanvas-2.0.dylib ${HOMEBREW_PREFIX}/Cellar/libgnomecanvas/2.30.3_4/lib/libgnomecanvas-2.0.dylib
-#          ls -lR /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib
+          lgc=$(head -1 $(find $HOMEBREW_PREFIX -name 'libgnomecanvas-2.0.dylib'))
+          #sudo cp libgnomecanvas-2.0.dylib ${HOMEBREW_PREFIX}/Cellar/libgnomecanvas/2.30.3_4/lib/libgnomecanvas-2.0.dylib
+          sudo cp libgnomecanvas-2.0.dylib ${lgc}
+          #ls -lR $lgc /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib
         
 
       - name: Set up Perl
