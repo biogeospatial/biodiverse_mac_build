@@ -222,7 +222,7 @@ sub icon_into_app_file {
 }
 
 
-icon_into_app_file ();
+# icon_into_app_file ();
 
 
 ###########################################

@@ -73,6 +73,9 @@ sub remove_old_read_only_dmg() {
 sub copy_new_app() {
     # Copies the new Biodiverse.app to the mounted read/write dmg image.
     # Default is ../builds/Biodiverse.app.
+    say "Updating icon file";
+    system ('fileicon', 'set', $app, 'images/icon.icns');
+    warn $@ if $@;
     say "copy $app into $input";
     say "$app size is " . (-s $app);
     my @copy_app_args = ("cp", "-r", "$app" , "$mounted");
