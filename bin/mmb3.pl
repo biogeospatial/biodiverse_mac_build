@@ -217,7 +217,7 @@ sub icon_into_app_file {
     #  https://stackoverflow.com/questions/8371790/how-to-set-icon-on-file-or-directory-using-cli-on-os-x
     #  https://apple.stackexchange.com/questions/6901/how-can-i-change-a-file-or-folder-icon-using-the-terminal
     my $target = "$root_dir/builds/Biodiverse.app/Icon";
-    system ('fileicon', 'set', $target, 'images/icon.icns';
+    system ('fileicon', 'set', $target, 'images/icon.icns');
     warn $@ if $@;
 }
 
