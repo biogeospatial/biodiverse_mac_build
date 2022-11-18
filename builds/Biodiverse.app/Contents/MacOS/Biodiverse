@@ -5,8 +5,10 @@ APPNAME="BiodiverseGUI"
 
 DIR="$(cd "$(dirname "$0")" && pwd -P)"
 
+DATETIME=$(date +%y%m%d-%H:%M:%S)
+LOG_FILE="$HOME/Library/Logs/$APPNAME/${APPNAME}-${DATETIME}.log"
+
 # Create the log file directory if it doesn't exist
-LOG_FILE="$HOME/Library/Logs/$APPNAME/$APPNAME.log"
 mkdir -p "`dirname \"$LOG_FILE\"`"
 
 # Run the app and redirect standard 
