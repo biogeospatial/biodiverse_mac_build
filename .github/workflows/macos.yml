@@ -38,8 +38,10 @@ jobs:
           ls /usr/lib/system
           
 
-      - name: Install pkgconfig
-        run: brew install pkgconfig
+      - name: Install pkgconfig and fileicon
+        run: |
+          brew install pkgconfig
+          brew install fileicon
 
       - name: Install GDAL and its deps
         run: brew install gdal
