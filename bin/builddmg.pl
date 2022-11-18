@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+###!/usr/bin/perl
 
 use strict;
 use warnings;
@@ -10,7 +10,7 @@ use Cwd 'abs_path';
 use File::Basename;
 use File::Spec::Functions;
 use FindBin;
-use lib "$FindBin::Bin/../../../lib";
+#use lib "$FindBin::Bin/../../../lib";
 use Biodiverse::Config;
 
 local $| = 1;
@@ -73,8 +73,11 @@ sub remove_old_read_only_dmg() {
 sub copy_new_app() {
     # Copies the new Biodiverse.app to the mounted read/write dmg image.
     # Default is ../builds/Biodiverse.app.
-    print "copy $app into $input\n";
-    print "$app size is " . (-s $app); 
+    say "Updating icon file";
+    system ('fileicon', 'set', $app, 'images/icon.icns');
+    warn $@ if $@;
+    say "copy $app into $input";
+    say "$app size is " . (-s $app);
     my @copy_app_args = ("cp", "-r", "$app" , "$mounted");
     system(@copy_app_args) == 0
         or die "system @copy_app_args failed: $?";
@@ -97,10 +100,13 @@ sub create_new_dmg() {
         or die "system @convert_args failed: $?";
 }
 
+say 'mount_read_write';
 mount_read_write_dmg();
+say 'removing app';
 remove_app();
 remove_old_read_only_dmg();
 copy_new_app();
+sleep(1);  #  maybe avoid some resource clashes
 unmount_read_write_dmg();
 create_new_dmg();
 
@@ -157,4 +163,3 @@ Location of the mounted dmg image.
 Builds a dmg image of Biodiverse.
 
 =cut
-

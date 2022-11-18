@@ -20,12 +20,13 @@ jobs:
     runs-on: macOS-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Probe wd
         run: |
           pwd
           ls -l
+          brew shellenv
           
       - name: Probe /usr/lib etc
         run: |
@@ -37,8 +38,10 @@ jobs:
           ls /usr/lib/system
           
 
-      - name: Install pkgconfig
-        run: brew install pkgconfig
+      - name: Install pkgconfig and fileicon
+        run: |
+          brew install pkgconfig
+          brew install fileicon
 
       - name: Install GDAL and its deps
         run: brew install gdal
@@ -56,60 +59,24 @@ jobs:
       
       - name: Install libgnomecanvas and cuckoo our patched dylib across
         run: |
+          eval "$(brew shellenv)"
           brew install libgnomecanvas
-          sudo cp libgnomecanvas-2.0.dylib /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib/libgnomecanvas-2.0.dylib
-          ls -lR /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib
+          echo Homebrew prefix is ${HOMEBREW_PREFIX}
+          echo Finding lignomecanvas dylibs
+          find ${HOMEBREW_CELLAR}/libgnomecanvas -name 'libgnomecanvas-2.0.dylib' -ls
+          lgc=$(find ${HOMEBREW_CELLAR}/libgnomecanvas -name 'libgnomecanvas-2.0.dylib' | head -1)
+          echo ${lgc}
+          #sudo cp libgnomecanvas-2.0.dylib ${HOMEBREW_PREFIX}/Cellar/libgnomecanvas/2.30.3_4/lib/libgnomecanvas-2.0.dylib
+          sudo cp libgnomecanvas-2.0.dylib ${lgc}
+          #ls -lR $lgc /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib
         
-      #- name: otool probe
-      #  run: |
-      #    otool -L /usr/local/opt/gdal/lib/libgdal.20.dylib
-      #    otool -L /usr/local/opt/glib/lib/libgobject-2.0.0.dylib
-      #    otool -L /usr/local/opt/glib/lib/libglib-2.0.0.dylib
-      #    otool -L /usr/local/opt/libffi/lib/libffi.6.dylib
-      #    otool -L /usr/local/opt/pango/lib/libpango-1.0.0.dylib
-      #    otool -L /usr/local/opt/pango/lib/libpangocairo-1.0.0.dylib
-      #    otool -L /usr/local/opt/cairo/lib/libcairo.2.dylib
-      #    otool -L /usr/local/opt/freetype/lib/libfreetype.6.dylib
-      #    otool -L /usr/local/opt/glib/lib/libgthread-2.0.0.dylib
-      #    otool -L /usr/local/opt/pcre1/lib/libpcre.1.dylib
-      #    otool -L /usr/local/opt/gettext/lib/libintl.8.dylib
-      #    otool -L /usr/local/opt/pango/lib/libpangoft2-1.0.0.dylib
-      #    otool -L /usr/local/opt/harfbuzz/lib/libharfbuzz.0.dylib
-      #    otool -L /usr/local/opt/fontconfig/lib/libfontconfig.1.dylib
-      #    otool -L /usr/local/opt/pixman/lib/libpixman-1.0.dylib
-      #    otool -L /usr/local/opt/libpng/lib/libpng16.16.dylib
-      #    otool -L /usr/local/opt/gtk+/lib/libgtk-quartz-2.0.0.dylib
-      #    otool -L /usr/local/opt/gtk+/lib/libgdk-quartz-2.0.0.dylib
-      #    otool -L /usr/local/opt/atk/lib/libatk-1.0.0.dylib
-      #    otool -L /usr/local/opt/gdk-pixbuf/lib/libgdk_pixbuf-2.0.0.dylib
-      #    otool -L /usr/local/opt/glib/lib/libgio-2.0.0.dylib
-      #    otool -L /usr/local/opt/glib/lib/libgmodule-2.0.0.dylib
-      #    otool -L /usr/local/opt/openssl/lib/libssl.1.0.0.dylib
-      #    otool -L /usr/local/opt/openssl/lib/libcrypto.1.0.0.dylib
-      #    otool -L /usr/local/opt/proj/lib/libproj.15.dylib
-      #    otool -L /usr/local/opt/json-c/lib/libjson-c.4.dylib
-      #    otool -L /usr/local/opt/freexl/lib/libfreexl.1.dylib
-      #    otool -L /usr/local/opt/geos/lib/libgeos_c.1.dylib
-      #    otool -L /usr/local/opt/giflib/lib/libgif.7.dylib
-      #    otool -L /usr/local/opt/libjpeg/lib/libjpeg.9.dylib
-      #    otool -L /usr/local/opt/libgeotiff/lib/libgeotiff.5.dylib
-      #    otool -L /usr/local/opt/libtiff/lib/libtiff.5.dylib
-      #    otool -L /usr/local/opt/libspatialite/lib/libspatialite.7.dylib
-      #    otool -L /usr/local/opt/geos/lib/libgeos-3.8.0.dylib
-      #    otool -L libgnomecanvas-2.0.dylib
-      #    otool -L /usr/local/opt/libart/lib/libart_lgpl_2.2.dylib
-      #    otool -L /usr/local/opt/gtk+/lib/libgailutil.18.dylib
-      #    otool -L /usr/local/opt/fribidi/lib/libfribidi.0.dylib
-      #    otool -L /usr/local/opt/pzstd/lib/libzstd.1.dylib
-      #    otool -L /usr/local/Cellar/libxml2/2.9.10/lib/libxml2.2.dylib
-      #    otool -L /usr/local/Cellar/sqlite/3.31.1/lib/libsqlite3.0.dylib
-      #    otool -L /usr/local/opt/graphite2/lib/libgraphite2.3.dylib
-        
+
       - name: Set up Perl
         run: |
           brew install perl
           curl https://cpanmin.us | perl - App::cpanminus -n
-          echo "##[add-path]/Users/runner/perl5/bin"
+          # echo "##[add-path]/Users/runner/perl5/bin"
+          echo "/Users/runner/perl5/bin" >> $GITHUB_PATH
 
       - name: perl -V
         run: perl -V
@@ -125,7 +92,7 @@ jobs:
       #  run: rm ~/perl5/${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
 
       - name: Cache CPAN modules
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/perl5
           key: ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
@@ -134,13 +101,16 @@ jobs:
 
       - name: Install cpan deps 
         run: |
+          cpanm App::PP::Autolink
+          which pp_autolink.pl
+          which -a pp
           #  no share install for Alien::MSYS
           cpanm --notest Alien::MSYS
           #  ensure share install for gdal et al
-          ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
-          ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
+          #ALIEN_INSTALL_TYPE=share cpanm --notest --installdeps Alien::gdal
+          #ALIEN_INSTALL_TYPE=share cpanm --notest -v Alien::gdal
           #ALIEN_INSTALL_TYPE=share cpanm --notest -v https://github.com/shawnlaffan/perl-alien-gdal.git
-          cpanm --notest Task::Biodiverse::NoGUI
+          #cpanm --notest Task::Biodiverse::NoGUI
           cpanm --notest ExtUtils::PkgConfig
           cpanm --notest ExtUtils::Depends
           cpanm --notest Gtk2
@@ -149,99 +119,38 @@ jobs:
           cpanm --notest PAR::Packer
           cpanm --notest File::BaseDir
           cpanm --notest File::Find::Rule
-      
-      - name: pack gdal script
-        run: |
-          echo "========"
-          perl pp_gdal_check.pl
-          echo "========"
-          echo Running packed exe
-          ./pp_gdal_check
-          echo "========"
-          echo Running with /usr/local dirs out of the way
-          sudo mv /usr/local/opt /usr/local/optx
-          sudo mv /usr/local/Cellar /usr/local/Cellarx
-          ./pp_gdal_check
-          echo Putting /usr/local dirs back
-          sudo mv /usr/local/optx /usr/local/opt
-          sudo mv /usr/local/Cellarx /usr/local/Cellar
-          echo "========"
-          
-      - name: Upload checkpp artefact
-        uses: actions/upload-artifact@v1
-        with:
-          name: pp_gdal_check
-          #path: ${DMG_FILE_NAME}
-          path: ./pp_gdal_check
-      
-      - name: Test pack
-        run: |
-          #ls -l /usr/local/lib/../Cellar/gdal/2.4.4/lib/libgdal.20.dylib
-          #ls -l /usr/local/opt/gdal/2.4.4/lib/libgdal.20.dylib
-          echo Running perl dynamic_libs check
-          perl -e 'use 5.020; use Geo::GDAL::FFI; say join ":", Alien::gdal->dynamic_libs'
-          pp -M Alien::gdal -M Alien::proj -M Alien::geos::af -M Alien::sqlite -M FFI::CheckLib -e 'use 5.020; use Alien::gdal; say join ":", Alien::gdal->dynamic_libs' -o checkpp
-          echo Running checkpp dynamic libs check
-          ./checkpp
-          echo Running checkpp with /usr/local dirs out of the way
-          sudo mv /usr/local/opt /usr/local/optx
-          sudo mv /usr/local/Cellar /usr/local/Cellarx
-          ./checkpp
-          echo Putting /usr/local dirs back
-          sudo mv /usr/local/optx /usr/local/opt
-          sudo mv /usr/local/Cellarx /usr/local/Cellar
-          
-          
-      - name: Alien O'Toole
-        run: |
-          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-gdal/lib/libgdal.dylib
-          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-gdal/lib/libgdal.26.dylib
-          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-geos-af/lib/libgeos.dylib
-          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-geos-af/lib/libgeos_c.dylib
-          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-sqlite/lib/libsqlite3.dylib
-          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-sqlite/lib/libsqlite3.0.dylib
-          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-proj/lib/libproj.dylib
-          otool -L /Users/runner/perl5/lib/perl5/darwin-thread-multi-2level/auto/share/dist/Alien-proj/lib/libproj.19.dylib
-        
-      - name: Upload checkpp artefact
-        uses: actions/upload-artifact@v1
-        with:
-          name: checkpp
-          #path: ${DMG_FILE_NAME}
-          path: ./checkpp
 
       - name: Clone biodiverse repo
-        run: git clone https://github.com/shawnlaffan/biodiverse.git
+        run: | 
+          git clone --depth=1 https://github.com/shawnlaffan/biodiverse.git
+          cd biodiverse
+          cpanm --installdeps .
+          prove t/00-load.t
+          cd -
         
-      #- name: Check Biodiverse can run
+      #- name: Check Biodiverse can run, except that it hangs
       #  run: prove -l biodiverse/t
       
       - name: Resize dmg file
         run: hdiutil resize -size 75MB ./images/Biodiverse.dmg
       
       - name: Run mmb3.pl
-        run: perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl
+        run: |
+          eval "$(brew shellenv)"
+          export PATH=/Users/runner/perl5/bin:$PATH
+          which -a pp
+          echo $SHELL
+          perl bin/mmb3.pl -v -s biodiverse/bin/BiodiverseGUI.pl
         
       - name: Find dmg file
         run: |
           export DMG_FILE_NAME=`find ./builds -name Biodiverse-*.dmg -print`
           echo ${DMG_FILE_NAME}
           
-      - name: Try to run the app
-        run: |
-          echo With system /usr/loca/opt in path
-          BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
-          #  we need the brewed libs out of the way for this check
-          echo Moving /usr/local/lib
-          sudo mv /usr/local/lib /usr/local/libx
-          BDV_PP_BUILDING=1 ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
-          echo Returning /usr/local/lib
-          sudo mv /usr/local/libx /usr/local/lib
-          
         
       - name: Upload artefact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v3
         with:
           name: dmg-file
           #path: ${DMG_FILE_NAME}
-          path: ./builds/Biodiverse-3.00-2.dmg
+          path: ./builds/Biodiverse-*.dmg

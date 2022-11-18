@@ -4,17 +4,20 @@ use 5.010;
 use strict;
 use warnings;
 use English qw { -no_match_vars };
+use Carp;
 
 local $| = 1;
 
 use Config;
 use File::Copy;
-use Path::Class;
-use Cwd;
 use Cwd 'abs_path';
 use File::Basename;
-use File::Find;
 use File::BaseDir qw/xdg_data_dirs/;
+use Path::Tiny qw/ path /;
+use Module::ScanDeps;
+use File::Find::Rule ();
+use File::Which qw /which/;
+
 
 
 use Getopt::Long::Descriptive;
@@ -27,6 +30,7 @@ my ($opt, $usage) = describe_options(
   [ 'lib_paths|l=s@',          'Paths to search for dynamic libraries'],
   [ 'pixbuf_loaders|p=s',      'The pixbuf loaders directory'],
   [ 'pixbuf_query_loader|q=s', 'The pixbuf query loader'],
+  [ 'gdk_pixbuf_dir=s',        'gdk_pixbuf_dir location'],
   [ 'hicolor|h=s',             'The hicolor shared directory'],
   [ 'verbose|v!',              'Verbose building?', {default => 0} ],
   [ 'execute|x!',              'Execute the script to find dependencies?', {default => 1} ],
@@ -40,30 +44,53 @@ if ($opt->help) {
     exit;
 }
 
+my $pixbuf_loader = `which gdk-pixbuf-query-loaders`;
+chomp $pixbuf_loader;
+#say STDERR "HHHHHH $pixbuf_loader";
+my @tmp = grep {/LoaderDir/} `$pixbuf_loader`;
+my $pixbuf_loader_dir = shift @tmp;
+$pixbuf_loader_dir =~ s/^.+= //;
+chomp $pixbuf_loader_dir;
+
+#say STDERR "kkkkk $pixbuf_base";
+
+
 my $script            = $opt->script;
 my $verbose           = !!$opt->verbose;
-my $lib_paths         = $opt->lib_paths ? $opt->lib_paths : [q{/usr/local/opt}];
+my $lib_paths         = $opt->lib_paths || [$ENV{HOMEBREW_PREFIX}, '/opt', '/usr/local/opt'];
 my $execute           = $opt->execute ? '-x' : q{};
-my @pixbuf_loaders    = $opt->pixbuf_loaders ? $opt->pixbuf_loaders : q{/usr/local/opt/gdk-pixbuf/lib/gdk-pixbuf-2.0/2.10.0/loaders}; # need a way of finding this.
-my @pixbuf_query_loader     = $opt->pixbuf_query_loader? $opt->pixbuf_query_loader : q{/usr/local/bin/gdk-pixbuf-query-loaders}; # need a way of finding this.
-my @hicolor           = $opt->hicolor ? $opt->hicolor : q{/usr/local/share/icons/hicolor}; # need a way of finding this.
+my $pixbuf_loaders    = $opt->pixbuf_loaders || $pixbuf_loader_dir;
+my $pixbuf_query_loader     = $opt->pixbuf_query_loader || $pixbuf_loader;
+my $gdk_pixbuf_dir    = $opt->gdk_pixbuf_dir || path ($pixbuf_loader_dir)->parent->parent;
+my $hicolor_dir       = $opt->hicolor || "$ENV{HOMEBREW_PREFIX}/share/icons/hicolor";
+# q{/usr/local/share/icons/hicolor}; # need a way of finding this.
 my @rest_of_pp_args   = @ARGV;
+
+die "Cannot find pixbuf loader $pixbuf_loaders"
+  if !-d $pixbuf_loaders;
+die "Cannot find pixbuf loader location $gdk_pixbuf_dir"
+  if !-d $gdk_pixbuf_dir;
+die "Cannot find pixbuf query loader location $pixbuf_query_loader"
+  if !-e $pixbuf_query_loader;
+die "Cannot find pixbuf query loader location $hicolor_dir"
+  if !-d $hicolor_dir;
+
 
 #die "Script file $script does not exist or is unreadable" if !-r $script;
 
 #  assume bin folder is at parent folder level
-my $script_root_dir = Path::Class::file ($script)->dir->parent;
-my $root_dir = Path::Class::file ($0)->dir->parent;
-say "Root dir is " . Path::Class::dir ($root_dir)->absolute->resolve;
-my $bin_folder = Path::Class::dir ($script_root_dir, 'bin');
-my $icon_file  = $opt->icon_file // Path::Class::file ($bin_folder, 'Biodiverse_icon.ico')->absolute->resolve;
+my $script_root_dir = path ($script)->parent->parent;
+my $root_dir = path($0)->parent->parent->absolute;
+say "Root dir is $root_dir";
+my $bin_folder = path ("$script_root_dir/bin");
+my $icon_file  = $opt->icon_file // path ($bin_folder, 'Biodiverse_icon.ico')->realpath;
 say "Icon file is $icon_file";
 
-my $out_folder   = $opt->out_folder // Path::Class::dir ($root_dir, 'builds','Biodiverse.app','Contents','MacOS');
+my $out_folder   = $opt->out_folder // path ($root_dir, 'builds','Biodiverse.app','Contents','MacOS');
 
 my $perlpath     = $EXECUTABLE_NAME;
 
-my $script_fullname = Path::Class::file($script)->absolute;
+my $script_fullname = path ($script)->absolute;
 my $output_binary = basename ($script_fullname, '.pl', qr/\.[^.]*$/);
 
 if (!-d $out_folder) {
@@ -79,177 +106,20 @@ if (!-d $out_folder) {
 #  File::BOM dep are otherwise not found
 $ENV{BDV_PP_BUILDING}              = 1;
 $ENV{BIODIVERSE_EXTENSIONS_IGNORE} = 1;
-
-use File::Find::Rule ();
-our %dylib_files_hash;
-BEGIN {
-    my @dylib_files_list
-      = File::Find::Rule->extras({ follow => 1, follow_skip=>2 })
-                        ->file()
-                        ->name( qr/\d\.dylib$/ )
-                        ->in( '/usr/local/opt' )
-                        ;
-    #say '=====';
-    #say join "\n", @dylib_files_list;
-    #say '=====';
-    
-    %dylib_files_hash = map {basename ($_) => $_} @dylib_files_list;
-}
-
-my @links;
-
-# All the dynamic libraries to pack.
-# Could change this to only include 
-# the minimum set and then use 
-# otools -L to find all dependencies.
-my @dylibs = qw {
-    libgdal.20.dylib          libgobject-2.0.0.dylib
-    libglib-2.0.0.dylib       libffi.6.dylib
-    libpango-1.0.0.dylib      libpangocairo-1.0.0.dylib
-    libcairo.2.dylib          libfreetype.6.dylib
-    libgthread-2.0.0.dylib    libpcre.1.dylib
-    libintl.8.dylib           libpangoft2-1.0.0.dylib
-    libharfbuzz.0.dylib       libfontconfig.1.dylib
-    libpixman-1.0.dylib       libpng16.16.dylib
-    libgtk-quartz-2.0.0.dylib libgdk-quartz-2.0.0.dylib
-    libatk-1.0.0.dylib        libgdk_pixbuf-2.0.0.dylib
-    libgio-2.0.0.dylib        libgmodule-2.0.0.dylib
-    libssl.1.0.0.dylib        libwebp.7.dylib
-    libcrypto.1.0.0.dylib     libcrypto.1.1.dylib
-    libproj.15.dylib          libpq.5.dylib
-    libjson-c.4.dylib         libfreexl.1.dylib
-    libgeos_c.1.dylib         libgif.7.dylib
-    libjpeg.9.dylib           libgeotiff.5.dylib
-    libtiff.5.dylib           libspatialite.7.dylib
-    libgeos-3.8.0.dylib       liblzma.5.dylib
-    libgnomecanvas-2.0.dylib  libart_lgpl_2.2.dylib
-    libgailutil.18.dylib      libfribidi.0.dylib
-    libzstd.1.dylib           libxerces-c-3.2.dylib
-    libepsilon.1.dylib        libjasper.4.dylib
-    libodbc.2.dylib           libodbcinst.2.dylib
-    libexpat.1.dylib          libxerces-c-3.2.dylib
-    libnetcdf.15.dylib        libhdf5.103.dylib
-    libcfitsio.8.dylib
-    libdap.25.dylib           libdapserver.7.dylib
-    libdapclient.6.dylib      libcurl.4.dylib 
-    libopenjp2.7.dylib        libcfitsio.8.dylib
-    /usr/local/Cellar/libxml2/2.9.10/lib/libxml2.2.dylib
-    libsqlite3.0.dylib
-    libgraphite2.3.dylib
-};
-#  moved out:
-#  /usr/local/Cellar/sqlite/3.31.1/lib/libsqlite3.0.dylib
+$ENV{BD_NO_GUI_DEV_WARN} = 1;
 
 
-# Find the absolute paths to each supplied
-# dynamic library. Each library is supplied
-# to pp with a -a and uses an alias. The alias
-# packs the library at the top level of the 
-# Par:Packer archive. This is where the 
-# Biodiverse binary will be able to find it.
-print "finding dynamic library paths\n";
-my %checked_dylib;
-for my $name (sort @dylibs) {
-    next if $checked_dylib{$name};
-    say "Checking location of $name";
-    my $lib = find_dylib_in_path($name, @$lib_paths);
-    my $filename = Path::Class::file ($name)->basename;
-    push @links, '-a', "$lib\;../$filename";
-    print "library $lib will be included as ../$filename\n" if ($verbose);
-    $checked_dylib{$name}++;
-}
-
-# Setup the paths to export
-# as the environmental variables
-# DYLD_LIBRARY_PATH and LD_LIBRARY_PATH.
-# These are exported as temportary environmental variables
-# when pp is run.
-create_lib_paths();
-
-# Use otools the get the name proper of the dynamic
-# library.
-sub get_name_from_dynamic_lib {
-    my $lib = shift;
-    
-    my $name;
-
-    chomp(my @ot = qx( otool -D $lib ));
-    if ($? == 0) {
-        $name = $ot[1];
-        print "otool: library $lib has install name $name\n" if ($verbose);
-    }
-    return $name;
-}
+my @hard_coded_dylibs = (
+    #  hard code for now
+    # '/usr/local/Cellar/openssl/1.0.2p/lib/libssl.1.0.0.dylib',
+    # '"/usr/local/Cellar/openssl@1.1/1.1.1d/lib/libssl.1.1.dylib"',
+    # '"/usr/local/Cellar/openssl@1.1/1.1.1d/lib/libcrypto.1.0.0.dylib"',
+    #"$root_dir/libssl.1.1.dylib",
+    #"$root_dir/libcrypto.1.1.dylib",
+    #'$ENV{HOMEBREW_PREFIX}/Cellar/libgnomecanvas/2.30.3_5/lib/libgnomecanvas-2.0.dylib',
+);
 
 
-# Search for a dynamic library
-# in the paths supplied. 
-sub find_dylib_in_path {
-    my ($file, @path) = @_;
-
-
-    # If $file is an absolute path
-    # then return with a fully resolved
-    # file and path.
-    #return get_name_from_dynamic_lib($file) if -f $file;
-    return $file if -f $file;
-
-    return $dylib_files_hash{$file} if $dylib_files_hash{$file};
-    
-    #  fallback search
-    say "Searching for file $file";
-
-    my $abs = "";
-    my $dlext = $^O eq 'darwin' ? 'dylib' : $Config{dlext};
-
-    # setup regular expressions variables
-    # Example of patterns
-    # Search pattern for finding dynamic libraries.
-    #  <PREFIX><NAME><DELIMITER><VERSION><EXTENSION>
-    # Examples:
-    # for name without anything:               ffi
-    # for name pattern prefix:name             libffi
-    # for name pattern name:version:           ffi.6
-    # for name pattern prefix:name:version:    libffi.6
-    # for name pattern prefix:name:version:ext libffi.6.dylib
-    for my $dir (@path) {
-        next if (! -d $dir);
-        $file  = substr $file, 0, -6 if $file =~ m/$dlext$/;
-        find ({wanted => sub {return unless /^(lib)*$file(\.|-)[\d*\.]*\.$dlext$/; $abs = $File::Find::name}, follow=>1, follow_skip=>2 },$dir );
-        find ({wanted => sub {return unless /^(lib)*$file\.$dlext$/; $abs = $File::Find::name}, follow=>1, follow_skip=>2 },$dir ) if ! $abs;
-        return $abs if $abs;
-        #print "could not file: $file\n" if (! $abs);
-    }
-    print "could not find file: $file\n" if (! $abs);
-    return $abs;
-}
-
-# Create the DYLD_LIBRARY_PATH
-# and LD_LIBRARY_PATH environmental
-# variables.
-my $dyld_library_path = "DYLD_LIBRARY_PATH=inc:/System/Library/Frameworks/ImageIO.framework/Versions/A/Resources/:";
-my $ld_library_path = "LD_LIBRARY_PATH=inc:/System/Library/Frameworks/ImageIO.framework/Versions/A/Resources/:";
-
-sub create_lib_paths {
-   for my $name (@$lib_paths){
-        $dyld_library_path .= $name . ":" . "inc" . $name . ":";
-        $ld_library_path   .= $name . ":" . "inc" . $name . ":";
-    }
-
-    chop $dyld_library_path;
-    chop $ld_library_path;
-    print "[create_lib_paths] \$dyld_library_path: $dyld_library_path\n" 
-      if $verbose;
-    print "[create_lib_paths] \$ld_library_path: $ld_library_path\n" 
-      if $verbose;
-}
-
-
-#my @gdal_deps = qw /jpeg gif geotiff proc
-#                  json-c pcre freexl spatialite
-#/;
-#
-#my @glib_deps = qw //;
 
 
 ###########################################
@@ -260,88 +130,71 @@ sub create_lib_paths {
 my @add_files;
 my @mime_dirs;
 
-sub get_xdg_data_dirs(){
-    my @xdg_data_dirs = xdg_data_dirs;
-    for my $dir (@xdg_data_dirs){
-        if ( -d $dir . "/mime" ) {
-            say "Found mime dir $dir" if $verbose;
-            push @mime_dirs, $dir . "/mime";
-        }
-    }
-}
-# Add the  mime types directory.
-get_xdg_data_dirs();
-
 
 for my $dir (@mime_dirs) {
-    my $mime_dir_abs  = Path::Class::file ($dir)->basename;
-    push @add_files, ('-a', "$dir\;$mime_dir_abs");  
+    my $mime_dir_abs  = path ($dir)->basename;
+    push @add_files, ('-a', "$dir\;$mime_dir_abs");
 }
 
-# Add the pixbuf loaders directory
-my $pixbuf_loaders_abs  = Path::Class::dir (@pixbuf_loaders)->basename;
-push @add_files, ('-a', "@pixbuf_loaders\\;$pixbuf_loaders_abs/");  
-
-# Add the pixbuf query loader
-#$pixbuf_loader = Path::Class::file ('usr','local','bin','gdk-pixbuf-query-loaders')
-my $pixbuf_loader_abs  = Path::Class::file (@pixbuf_query_loader)->basename;
-push @add_files, ('-a', "@pixbuf_query_loader\;$pixbuf_loader_abs");  
+say "\n-----\n";
 
 # Add the hicolor directory
-#my $hicolor_dir = Path::Class::dir ('usr','local','share','icons','hicolor')
-my $hicolor_dir_abs  = Path::Class::dir (@hicolor)->basename;
-push @add_files, ('-a', "@hicolor\;icons/$hicolor_dir_abs");
+my $hicolor_dir_abs  = path ($hicolor_dir)->realpath->basename;
+
+my @xxx;
+push @xxx, ('-a', "$pixbuf_query_loader\;" . path ($pixbuf_query_loader)->basename);
+foreach my $dir ($pixbuf_loaders, $gdk_pixbuf_dir) {
+    my $path = path ($dir)->realpath;
+    my $basename = path ($dir)->basename;
+    push @xxx, ('-a', "$path\;$basename");
+}
+push @xxx, ('-a', "$hicolor_dir\;icons/$hicolor_dir_abs");
+
+#  clunky, but previous approach was sneaking a 1 into the array
+@add_files = (@add_files, @xxx);
+
+say join ' ', @add_files;
+say "-----\n";
+# my $zz = <>;
+
 
 # Add the ui directory
 my @ui_arg = ();
 
 if ($script =~ 'BiodiverseGUI.pl') {
-    my $ui_dir = Path::Class::dir ($bin_folder, 'ui')->absolute;
+    my $ui_dir = path ($bin_folder, 'ui')->absolute;
     @ui_arg = ('-a', "$ui_dir\;ui");
 }
 
-my $output_binary_fullpath = Path::Class::file ($out_folder, $output_binary)->absolute;
+my $output_binary_fullpath = path ($out_folder, $output_binary)->absolute;
 
 my $icon_file_base = $icon_file ? basename ($icon_file) : '';
 my @icon_file_arg  = $icon_file ? ('-a', "$icon_file\;$icon_file_base") : ();
 
-###########################################
+# ###########################################
+# #
+# # Run the constructed pp command.
+# #
+# ###########################################
 #
-# Run the constructed pp command. 
-#
-###########################################
 
-# export the dynamic library paths environmental variables.
-$ENV{DYLD_LIBRARY_PATH} = $dyld_library_path;
-$ENV{LD_LIBRARY_PATH} = $ld_library_path;
 
-#  we need to use -M with the aliens,
-#  and possibly some others
-my @aliens = qw /
-    Alien::gdal       Alien::geos::af
-    Alien::proj       Alien::sqlite
-    File::ShareDir
-/;
-#    Alien::spatialite Alien::freexl
-#/;
-#  we don't always have all of the aliens installed
-foreach my $alien (@aliens) {
-    if (eval "require $alien") {
-        push @rest_of_pp_args, '-M' => $alien;
-    }
-}
+my @verbose_command = $verbose ? ("-v") : ();
 
+my $pp_autolink = `which pp_autolink.pl`;
+chomp $pp_autolink;
+my @pp_cmd = ($^X, $pp_autolink);
 my @cmd = (
-    'pp',
-    #$verbose,
-    '-u',
+    @pp_cmd,
+    @verbose_command,
+    # '-u', # not needed post perl 5.31.6
     '-B',
     '-z',
     9,
     @ui_arg,
     @icon_file_arg,
     $execute,
-    @links,
+    # @inc_to_pack,
     @add_files,
     @rest_of_pp_args,
     '-o',
@@ -349,27 +202,42 @@ my @cmd = (
     $script_fullname,
 );
 
-if ($verbose) {
-    my @verbose_command = $verbose ? ("-v") : ();
-    splice @cmd, 1, 0, @verbose_command;
-}
 
 say join ' ', "\nCOMMAND TO RUN:\n", @cmd;
 
 system @cmd;
+die $? if $?;
+
+# say 'Updating binary in preparation for code signing';
+# system ("pp_osx_codesign_fix", $output_binary_fullpath);
+
+#  not sure this works
+sub icon_into_app_file {
+    #  also see
+    #  https://stackoverflow.com/questions/8371790/how-to-set-icon-on-file-or-directory-using-cli-on-os-x
+    #  https://apple.stackexchange.com/questions/6901/how-can-i-change-a-file-or-folder-icon-using-the-terminal
+    my $target = "$root_dir/builds/Biodiverse.app/Icon";
+    system ('fileicon', 'set', $target, 'images/icon.icns');
+    warn $@ if $@;
+}
+
+
+# icon_into_app_file ();
 
 
 ###########################################
 #
-# Build the dmg image. 
+# Build the dmg image.
 #
 ###########################################
 sub build_dmg(){
     print "[build_dmg] Building dmg image...\n" if ($verbose);
-    my $builddmg = Path::Class::dir ($root_dir,'bin', 'builddmg.pl' );
+    my $builddmg = path ($root_dir,'bin', 'builddmg.pl' )->absolute->stringify;
     print "[build_dmg] build_dmg: $builddmg\n" if ($verbose);
-    local $ENV{PERL5LIB} = "$script_root_dir/lib:$ENV{PERL5LIB}";
-    system ('perl', $builddmg);
+    say "script root dir is $script_root_dir";
+    say "PERL5LIB env var is " . ($ENV{PERL5LIB} // '');
+    local $ENV{PERL5LIB} = "$script_root_dir/lib:" . ($ENV{PERL5LIB} // "");
+    system ($^X, $builddmg);
 }
 
 build_dmg();
