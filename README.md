@@ -12,3 +12,4 @@ This repo is for the mac build scripts, the bulk of which were developed by Jaso
 # Persistent URL 
 
 http://www.purl.org/biodiverse
+https://github.com/shawnlaffan/biodiverse
