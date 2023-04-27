@@ -86,6 +86,7 @@ my $bin_folder = path ("$script_root_dir/bin");
 my $icon_file  = $opt->icon_file // path ($bin_folder, 'Biodiverse_icon.ico')->realpath;
 say "Icon file is $icon_file";
 
+#  ISSUES HERE - THE BUILD NEEDS THE SECOND OPTION
 my $out_folder   = $opt->out_folder // path ($root_dir, 'builds','Biodiverse.app','Contents','MacOS');
 
 my $perlpath     = $EXECUTABLE_NAME;
