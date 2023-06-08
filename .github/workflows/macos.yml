@@ -57,19 +57,6 @@ jobs:
       - name: Install Gtk etc
         run: brew install gdk-pixbuf pango gtk+ gtk+3
       
-      - name: Install libgnomecanvas and cuckoo our patched dylib across
-        run: |
-          eval "$(brew shellenv)"
-          brew install libgnomecanvas
-          echo Homebrew prefix is ${HOMEBREW_PREFIX}
-          echo Finding lignomecanvas dylibs
-          find ${HOMEBREW_CELLAR}/libgnomecanvas -name 'libgnomecanvas-2.0.dylib' -ls
-          lgc=$(find ${HOMEBREW_CELLAR}/libgnomecanvas -name 'libgnomecanvas-2.0.dylib' | head -1)
-          echo ${lgc}
-          #sudo cp libgnomecanvas-2.0.dylib ${HOMEBREW_PREFIX}/Cellar/libgnomecanvas/2.30.3_4/lib/libgnomecanvas-2.0.dylib
-          sudo cp libgnomecanvas-2.0.dylib ${lgc}
-          #ls -lR $lgc /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib
-        
 
       - name: Set up Perl
         run: |
@@ -80,6 +67,21 @@ jobs:
 
       - name: perl -V
         run: perl -V
+
+      - name: Install libgnomecanvas 
+        run: |
+          eval "$(brew shellenv)"
+          brew install libart
+          \curl -L https://download.gnome.org/sources/libgnomecanvas/2.30/libgnomecanvas-2.30.3.tar.bz2 > lgc.tar.bz
+          tar xf lgc.tar.bz
+          cd libgnomecanvas-2.30.3
+          \curl -L https://raw.githubusercontent.com/shawnlaffan/biodiverse/master/etc/libgnomecanvas.patch > libgnomecanvas.patch
+          patch -d libgnomecanvas < libgnomecanvas.patch
+          #  one should avoid installing into HOMEBREW_PATH on local builds, but CI is throw-away
+          ./configure --disable-dependency-tracking --disable-static --prefix=$HOMEBREW_PREFIX --disable-glade
+          make
+          make install
+
 
       - name: Prepare for cache
         run: |
