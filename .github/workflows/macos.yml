@@ -69,6 +69,14 @@ jobs:
       - name: perl -V
         run: perl -V
 
+      - name: Prepare for cache
+        continue-on-error: true
+        run: |
+          perl -V > perlversion.txt
+          #  change the checksum so we refresh the cache
+          echo 'with shared Alien installs' >> perlversion.txt
+          ls -l perlversion.txt
+
       - name: Install libgnomecanvas 
         run: |
           eval "$(brew shellenv)"
@@ -84,14 +92,6 @@ jobs:
           ./configure --disable-dependency-tracking --disable-static --prefix=$HOMEBREW_PREFIX --disable-glade
           make
           make install
-
-
-      - name: Prepare for cache
-        run: |
-          perl -V > perlversion.txt
-          #  change the checksum so we refresh the cache
-          echo 'with shared Alien installs' >> perlversion.txt
-          ls -l perlversion.txt
 
       #- name: clear cache
       #  run: rm ~/perl5/${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
