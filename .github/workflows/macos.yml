@@ -137,7 +137,7 @@ jobs:
       #  run: prove -l biodiverse/t
       
       - name: Resize dmg file
-        run: hdiutil resize -size 75MB ./images/Biodiverse.dmg
+        run: hdiutil resize -size 100MB ./images/Biodiverse.dmg
       
       - name: Run mmb3.pl
         run: |
