@@ -71,6 +71,8 @@ jobs:
       - name: Install libgnomecanvas 
         run: |
           eval "$(brew shellenv)"
+          #  libgnomecanvas needs this
+          cpanm XML::Parser 
           brew install libart intltool gettext
           \curl -L https://download.gnome.org/sources/libgnomecanvas/2.30/libgnomecanvas-2.30.3.tar.bz2 > lgc.tar.bz
           tar xf lgc.tar.bz
