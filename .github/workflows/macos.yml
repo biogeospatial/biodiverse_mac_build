@@ -70,7 +70,6 @@ jobs:
         run: perl -V
 
       - name: Prepare for cache
-        continue-on-error: true
         run: |
           perl -V > perlversion.txt
           #  change the checksum so we refresh the cache
@@ -98,6 +97,7 @@ jobs:
 
       - name: Cache CPAN modules
         uses: actions/cache@v3
+        if: "!cancelled()"
         with:
           path: ~/perl5
           key: ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
@@ -137,7 +137,9 @@ jobs:
       #  run: prove -l biodiverse/t
       
       - name: Resize dmg file
-        run: hdiutil resize -size 100MB ./images/Biodiverse.dmg
+        run: |
+          hdiutil resize -size 100MB ./images/Biodiverse.dmg
+          df -h
       
       - name: Run mmb3.pl
         run: |
