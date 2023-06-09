@@ -13,6 +13,7 @@ env:
   PERL_LOCAL_LIB_ROOT: /Users/runner/perl5
   PERL_MB_OPT: --install_base /Users/runner/perl5
   PERL_MM_OPT: INSTALL_BASE=/Users/runner/perl5
+  PERL_CPANM_OPT: -M https://cpan.metacpan.org/
 
 jobs:
   perl:
@@ -57,19 +58,6 @@ jobs:
       - name: Install Gtk etc
         run: brew install gdk-pixbuf pango gtk+ gtk+3
       
-      - name: Install libgnomecanvas and cuckoo our patched dylib across
-        run: |
-          eval "$(brew shellenv)"
-          brew install libgnomecanvas
-          echo Homebrew prefix is ${HOMEBREW_PREFIX}
-          echo Finding lignomecanvas dylibs
-          find ${HOMEBREW_CELLAR}/libgnomecanvas -name 'libgnomecanvas-2.0.dylib' -ls
-          lgc=$(find ${HOMEBREW_CELLAR}/libgnomecanvas -name 'libgnomecanvas-2.0.dylib' | head -1)
-          echo ${lgc}
-          #sudo cp libgnomecanvas-2.0.dylib ${HOMEBREW_PREFIX}/Cellar/libgnomecanvas/2.30.3_4/lib/libgnomecanvas-2.0.dylib
-          sudo cp libgnomecanvas-2.0.dylib ${lgc}
-          #ls -lR $lgc /usr/local/Cellar/libgnomecanvas/2.30.3_4/lib
-        
 
       - name: Set up Perl
         run: |
@@ -88,11 +76,28 @@ jobs:
           echo 'with shared Alien installs' >> perlversion.txt
           ls -l perlversion.txt
 
+      - name: Install libgnomecanvas 
+        run: |
+          eval "$(brew shellenv)"
+          #  libgnomecanvas needs this
+          cpanm XML::Parser 
+          brew install libart intltool gettext
+          \curl -L https://download.gnome.org/sources/libgnomecanvas/2.30/libgnomecanvas-2.30.3.tar.bz2 > lgc.tar.bz
+          tar xf lgc.tar.bz
+          cd libgnomecanvas-2.30.3
+          \curl -L https://raw.githubusercontent.com/shawnlaffan/biodiverse/master/etc/libgnomecanvas.patch > libgnomecanvas.patch
+          patch -d libgnomecanvas < libgnomecanvas.patch
+          #  one should avoid installing into HOMEBREW_PATH on local builds, but CI is throw-away
+          ./configure --disable-dependency-tracking --disable-static --prefix=$HOMEBREW_PREFIX --disable-glade
+          make
+          make install
+
       #- name: clear cache
       #  run: rm ~/perl5/${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
 
       - name: Cache CPAN modules
         uses: actions/cache@v3
+        if: "!cancelled()"
         with:
           path: ~/perl5
           key: ${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
@@ -132,7 +137,9 @@ jobs:
       #  run: prove -l biodiverse/t
       
       - name: Resize dmg file
-        run: hdiutil resize -size 75MB ./images/Biodiverse.dmg
+        run: |
+          hdiutil resize -size 100MB ./images/Biodiverse.dmg
+          df -h
       
       - name: Run mmb3.pl
         run: |

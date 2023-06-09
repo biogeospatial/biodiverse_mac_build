@@ -209,6 +209,9 @@ say join ' ', "\nCOMMAND TO RUN:\n", @cmd;
 system @cmd;
 die $? if $?;
 
+say "Output binary size (MB) is: " . sprintf "%.3f", ((-s $output_binary_fullpath) / (1024 ** 2));
+
+
 # say 'Updating binary in preparation for code signing';
 # system ("pp_osx_codesign_fix", $output_binary_fullpath);
 
