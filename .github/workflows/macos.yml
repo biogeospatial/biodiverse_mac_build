@@ -21,7 +21,7 @@ jobs:
     runs-on: macOS-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Probe wd
         run: |
@@ -96,7 +96,7 @@ jobs:
       #  run: rm ~/perl5/${{ runner.os }}-build-${{ hashFiles('perlversion.txt') }}
 
       - name: Cache CPAN modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         if: "!cancelled()"
         with:
           path: ~/perl5
@@ -156,7 +156,7 @@ jobs:
           
         
       - name: Upload artefact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dmg-file
           #path: ${DMG_FILE_NAME}
