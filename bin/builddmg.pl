@@ -9,6 +9,7 @@ use English qw { -no_match_vars };
 use Cwd 'abs_path';
 use File::Basename;
 use File::Spec::Functions;
+use Path::Tiny;
 use FindBin;
 #use lib "$FindBin::Bin/../../../lib";
 use Biodiverse::Config;
@@ -22,7 +23,7 @@ BEGIN {
 }
 
 my $bio_version = $Biodiverse::Config::VERSION;
-my $mac_build_version = 2;
+my $mac_build_version = 3;
 my $help;
 #my $verbose;
 my $man = 0;

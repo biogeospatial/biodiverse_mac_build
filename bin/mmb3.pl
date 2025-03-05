@@ -137,6 +137,15 @@ for my $dir (@mime_dirs) {
     push @add_files, ('-a', "$dir\;$mime_dir_abs");
 }
 
+#  hack for now
+{
+    use Alien::proj;
+    if (Alien::proj->is_system_install) {
+        push @add_files, ('-a', "$ENV{HOMEBREW_PREFIX}/share/proj/proj.db\;proj/proj.db");
+        push @add_files, ('-a', "$ENV{HOMEBREW_PREFIX}/share/proj/proj.ini\;proj/proj.ini");
+    }
+}
+
 say "\n-----\n";
 
 # Add the hicolor directory
