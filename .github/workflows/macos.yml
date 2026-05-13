@@ -162,7 +162,7 @@ jobs:
       #  e.g. blib/man3/App::cpanminus.3
       - name: Upload cpanm dir
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cpanm_dir
           path: ~/.cpanm
@@ -225,7 +225,7 @@ jobs:
           
         
       - name: Upload artefact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.dmg_file_name.outputs.DMG_FILE_NAME }}-${{ matrix.os }}
           path: ./builds/Biodiverse-*.dmg
@@ -256,7 +256,7 @@ jobs:
 
       - name: Upload gdal probe
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: gdal_probe-${{ matrix.os }}
           path: ./probe_gdal
