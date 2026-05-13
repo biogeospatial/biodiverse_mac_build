@@ -199,7 +199,7 @@ jobs:
           perl bin/mmb4.pl -v -s biodiverse/bin/BiodiverseGUI.pl -- --link ${sqlite_dylib}
       
       #  need to work out which type is most appropriate
-      - uses: actions/attest@v2
+      - uses: actions/attest@v4
         with:
           subject-path: ./builds/Biodiverse.app/Contents/MacOS/BiodiverseGUI
           predicate-type: 'https://slsa.dev/provenance/v0.2'
@@ -217,7 +217,7 @@ jobs:
           echo ${DMG_FILE_NAME}
           echo "DMG_FILE_NAME=${DMG_FILE_NAME}" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/attest@v2
+      - uses: actions/attest@v4
         with:
           subject-path: ./builds/Biodiverse*.dmg
           predicate-type: 'https://slsa.dev/provenance/v0.2'
