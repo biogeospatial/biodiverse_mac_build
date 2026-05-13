@@ -2,6 +2,8 @@ name: windows
 
 on:
   push:
+    paths:
+      - "build_trigger.txt"
     branches:
       - '*'
     tags-ignore:
