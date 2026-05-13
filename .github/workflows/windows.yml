@@ -86,7 +86,7 @@ jobs:
           echo '20251028' >> perlversion.txt
           
       - name: Cache CPAN modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         if: "!cancelled()"
         with:
           path: \Users\runner\perl5
