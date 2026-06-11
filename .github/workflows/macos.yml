@@ -159,7 +159,7 @@ jobs:
           cd biodiverse
           cpanm --installdeps . || cat $HOME/.cpanm/latest-build/build.log
           prove t/00-load.t || true  #  allow caching even if we fail
-          #prove -j4 -l t
+          prove -j4 -l t
           cd -
         
       #  Does nothing at the moment as hidden file are not uploaded.
