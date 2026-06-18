@@ -154,8 +154,8 @@ jobs:
 
       - name: Clone biodiverse repo
         run: | 
-          #git clone --branch r5.0 --depth=1 https://github.com/shawnlaffan/biodiverse.git
-          git clone --branch master --depth=1 https://github.com/shawnlaffan/biodiverse.git
+          git clone --branch r5.99_001 --depth=1 https://github.com/shawnlaffan/biodiverse.git
+          #git clone --branch master --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
           cpanm --installdeps . || cat $HOME/.cpanm/latest-build/build.log
           prove t/00-load.t || true  #  allow caching even if we fail
