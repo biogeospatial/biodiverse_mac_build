@@ -199,7 +199,7 @@ jobs:
           # set PATH=%SP_PATHS%;%PATH%
           $env:PATH = "$env:SP_PATHS;$env:PATH"
           perl -E'say $^V'
-          git clone --branch r5.99_001 --depth=1 https://github.com/shawnlaffan/biodiverse.git
+          git clone --branch r5.99_002 --depth=1 https://github.com/shawnlaffan/biodiverse.git
           #git clone --branch master --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
           cpanm --installdeps .
