@@ -16,6 +16,7 @@ env:
   PERL_MB_OPT: --install_base /Users/runner/perl5
   PERL_MM_OPT: INSTALL_BASE=/Users/runner/perl5
   PERL_CPANM_OPT: -M https://www.cpan.org
+  BD_BRANCH: r5.99_002
 
 jobs:
   perl:
@@ -154,7 +155,7 @@ jobs:
 
       - name: Clone biodiverse repo
         run: | 
-          git clone --branch r5.99_002 --depth=1 https://github.com/shawnlaffan/biodiverse.git
+          git clone --branch ${BD_BRANCH} --depth=1 https://github.com/shawnlaffan/biodiverse.git
           #git clone --branch master --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
           cpanm --installdeps . || cat $HOME/.cpanm/latest-build/build.log
