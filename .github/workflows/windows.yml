@@ -205,6 +205,7 @@ jobs:
           cd biodiverse
           cpanm --installdeps .
           #prove t/00-load.t
+          prove xt\02-versions-all-same.t
           prove -j4 -l t
           cd ..
           
