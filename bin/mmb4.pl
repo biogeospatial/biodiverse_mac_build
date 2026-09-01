@@ -226,6 +226,7 @@ my @icon_file_arg  = $icon_file ? ('-a', "$icon_file\;$icon_file_base") : ();
 
 
 my @verbose_command = $verbose ? ("-v") : ();
+push @rest_of_pp_args, (qw /-M URI::/);  #  or the help won't open
 
 my $pp_autolink = `which pp_autolink.pl`;
 chomp $pp_autolink;
