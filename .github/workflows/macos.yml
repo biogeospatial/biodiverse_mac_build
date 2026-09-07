@@ -16,7 +16,7 @@ env:
   PERL_MB_OPT: --install_base /Users/runner/perl5
   PERL_MM_OPT: INSTALL_BASE=/Users/runner/perl5
   PERL_CPANM_OPT: -M https://www.cpan.org
-  BD_BRANCH: r5.99_003
+  BD_BRANCH: r5.99_004
 
 jobs:
   perl:
