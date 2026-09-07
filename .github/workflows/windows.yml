@@ -17,6 +17,7 @@ env:
   PERL_MM_OPT: INSTALL_BASE=/Users/runner/perl5
   PERL_CPANM_OPT: -M https://www.cpan.org
   PERL_CPANM_HOME: /Users/runner/_cpanm
+  BD_BRANCH: r5.99_004
   SP_VERSION: 5.38.4.1
   ST: C:\Strawberry538
   SP_PATHS: \Users\runner\perl5\bin;C:\Strawberry538\perl\bin;C:\Strawberry538\perl\site\bin;C:\Strawberry538\c\bin
@@ -58,12 +59,11 @@ jobs:
           Invoke-WebRequest -Uri "https://github.com/StrawberryPerl/Perl-Dist-Strawberry/releases/download/SP_53841_64bit/strawberry-perl-5.38.4.1-64bit-PDL.zip" -OutFile ".\sp.zip" 
           Expand-Archive -Path "sp.zip" -DestinationPath "$env:ST"
           ls "$env:ST"
-          echo "$env:ST\perl\bin;$env:ST\perl\site\bin;$env:ST\c\bin" >> $GITHUB_PATH
+          "PATH=$env:PERL_LOCAL_LIB_ROOT\bin;$env:ST\perl\bin;$env:ST\perl\site\bin;$env:ST\c\bin;$env:PATH" >> $env:GITHUB_ENV
 
       - name: perl -V
         shell: cmd
         run: |
-          set PATH=%SP_PATHS%;%PATH%
           path
           perl -V
 
@@ -81,7 +81,6 @@ jobs:
       - name: Prepare for cache
         shell: cmd
         run: |
-          set PATH=%SP_PATHS%;%PATH%
           path
           perl -V > perlversion.txt
           ::  change the checksum so we refresh the cache
@@ -107,11 +106,6 @@ jobs:
         shell: pwsh
         run: |
           $env:CMAKE_BUILD_PARALLEL_LEVEL=4
-          # set PATH=%SP_PATHS%;%PATH%
-          # path
-          $env:PATH = "$env:SP_PATHS;$env:PATH"
-          echo $env:PATH
-          # set PERL_CPANM_HOME=/Users/runner/.cpanm
           perl -E'say $^V'
           cpanm --notest PAR::Packer
           #cpanm App::PP::Autolink
@@ -143,7 +137,6 @@ jobs:
       - name: Alien::GtkStack and PPMs
         shell: pwsh
         run: |
-          $env:PATH = "$env:SP_PATHS;$env:PATH"
           git clone --depth=1 https://github.com/shawnlaffan/perl-alien-gtkstack-windows.git
           cd perl-alien-gtkstack-windows
           perl Makefile.PL
@@ -162,7 +155,6 @@ jobs:
       - name: PAR::Packer with Biodiverse icon
         shell: pwsh
         run: |
-          $env:PATH = "$env:SP_PATHS;$env:PATH"
           $env:PAR_PACKER = "PAR-Packer-1.064"
           $env:PP_GZ = "$env:PAR_PACKER.tar.gz"
           $env:URL = "https://cpan.metacpan.org/authors/id/R/RS/RSCHUPP/$env:PP_GZ"
@@ -181,8 +173,6 @@ jobs:
       - name: pp-autolink
         shell: pwsh
         run: |
-          $env:PATH = "$env:SP_PATHS;$env:PATH"
-          #cpanm App::PP::Autolink~2.13
           perl -E'say $^V'
           git clone --depth=1 https://github.com/shawnlaffan/perl-pp-autolink.git
           cd perl-pp-autolink
@@ -196,14 +186,14 @@ jobs:
       - name: Clone biodiverse repo
         shell: pwsh
         run: |
-          # set PATH=%SP_PATHS%;%PATH%
-          $env:PATH = "$env:SP_PATHS;$env:PATH"
           perl -E'say $^V'
-          git clone --branch r5.0 --depth=1 https://github.com/shawnlaffan/biodiverse.git
+          git clone --branch $env:BD_BRANCH --depth=1 https://github.com/shawnlaffan/biodiverse.git
+          #git clone --branch master --depth=1 https://github.com/shawnlaffan/biodiverse.git
           cd biodiverse
           cpanm --installdeps .
-          prove t/00-load.t
-          #prove -j4 -l t
+          #prove t/00-load.t
+          prove xt\02-versions-all-same.t
+          prove -j4 -l t
           cd ..
           
       
@@ -228,7 +218,6 @@ jobs:
       - name: Build exe
         shell: pwsh
         run: |
-          $env:PATH = "$env:SP_PATHS;$env:PATH"
           $env:BD_NO_GUI_DEV_WARN=1
           $env:BDV_PP_BUILDING=1
           $env:PERL5LIB="$env:PERL5LIB;/Users/runner/perl5/lib/perl5/MSWin32-x64-multi-thread"
